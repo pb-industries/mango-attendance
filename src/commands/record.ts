@@ -11,7 +11,6 @@ let attendees: string[] = [];
 let attendeeMetadata: {
   [key: string]: { id: number; recordedAttendance: boolean };
 } = {};
-// let currentZone = null;
 const fetchPlayers = async () => {
   const players = await getConnection()
     .select(["id", "name"])
@@ -96,14 +95,12 @@ const setRecordState = (line: string): boolean => {
  * @returns
  */
 const extractAttendanceInfo = (line: string) => {
-  const regExp = new RegExp(
-    /\[.+\] ([a-z]+) [\(a-z\)<> ]+: [a-z0-9' ]+ (\([a-z0-9'_]+\))/gi
-  );
+  const regExp = new RegExp(/\[.+\] ([a-z]+) [\(a-z\)<> ]+/gi);
   const matches = regExp.exec(line);
+  console.log(matches);
 
   return {
     player: matches?.[1] || null,
-    zone: matches?.[2]?.replace("(", "").replace(")", "") || null,
   };
 };
 

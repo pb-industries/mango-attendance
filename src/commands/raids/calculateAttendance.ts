@@ -61,6 +61,8 @@ export default async () => {
         attendance.attendance_life,
       ]);
 
+      console.log(sheetRows);
+
       return trx("player")
         .update(attendance)
         .where({ id: player_id })
@@ -78,8 +80,6 @@ export default async () => {
       console.log(e);
       console.log(chalk.red("unexpected error when saving attendance"));
       await trx.rollback();
-      throw e;
-    } finally {
       process.exit(1);
     }
   });
@@ -88,6 +88,7 @@ export default async () => {
 const allTime = async (
   conn: Knex<any, unknown[]>
 ): Promise<AttendanceDatum[]> => {
+  console.log(chalk.yellow("Fetching attendance % for all time"));
   return await conn
     .select(
       conn.raw(
@@ -106,6 +107,7 @@ const daysInRange = async (
   conn: Knex<any, unknown[]>,
   days: number
 ): Promise<AttendanceDatum[]> => {
+  console.log(chalk.yellow(`Fetching attendance % for the past ${days} days`));
   return await conn
     .select(
       conn.raw(
@@ -148,6 +150,7 @@ const updateSheet = async (playerAttendance: (string | number)[][]) => {
         console.log(
           chalk.green.bold(`Successfully updated attendance spreadsheet.`)
         );
+        process.exit(1);
       }
     }
   );
