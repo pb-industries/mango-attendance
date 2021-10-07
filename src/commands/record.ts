@@ -1,17 +1,16 @@
-const conf = new (require("conf"))();
 const chalk = require("chalk");
 const Tail = require("tail-file");
+import addRaid from "./raids/add";
 
 let recording = false;
-let currentZone = null;
+// let currentZone = null;
 
-module.exports = (name: string) => {
-  const localDate = new Date().toLocaleDateString();
-  const attendees = getAttendees(localDate);
+export default async (raidName: string) => {
   let lastTimestamp: number = 0;
+  const { name } = await addRaid(raidName);
+  const attendees: string[] = [];
 
-  console.log(chalk.green.bold(`Recording raid ${name}@${localDate}`));
-  conf.set(`raid-${localDate}`, { name, attendees });
+  console.log(chalk.green.bold(`Recording raid ${name}`));
 
   new Tail("eqlog.txt", (line: string) => {
     const { timestamp, shouldParse } = parseTimestamp(line, lastTimestamp);
@@ -96,20 +95,4 @@ const parseTimestamp = (line: string, lastParsedTimestamp: number) => {
 
   // Don't re-parse lines we've already parsed
   return { timestamp: dateTime, shouldParse: dateTime >= lastParsedTimestamp };
-};
-
-const getAttendees = (raidDate: string) => {
-  const raidConfig = conf.get(`raid-${raidDate}`);
-  let attendees = [];
-
-  if (raidConfig?.attendees && raidConfig.attendees.length > 0) {
-    console.log(
-      chalk.blue.bold(
-        `Recovered ${raidConfig.name} from previous run of the application...`
-      )
-    );
-    attendees = raidConfig.attendees;
-  }
-
-  return attendees;
 };

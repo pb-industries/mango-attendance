@@ -1,14 +1,26 @@
-const conf = new (require("conf"))();
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 const chalk = require("chalk");
 const Tail = require("tail-file");
+const add_1 = __importDefault(require("./raids/add"));
 let recording = false;
-let currentZone = null;
-module.exports = (name) => {
-    const localDate = new Date().toLocaleDateString();
-    const attendees = getAttendees(localDate);
+exports.default = (raidName) => __awaiter(void 0, void 0, void 0, function* () {
     let lastTimestamp = 0;
-    console.log(chalk.green.bold(`Recording raid ${name}@${localDate}`));
-    conf.set(`raid-${localDate}`, { name, attendees });
+    const { name } = yield (0, add_1.default)(raidName);
+    const attendees = [];
+    console.log(chalk.green.bold(`Recording raid ${name}`));
     new Tail("eqlog.txt", (line) => {
         const { timestamp, shouldParse } = parseTimestamp(line, lastTimestamp);
         if (!shouldParse) {
@@ -24,7 +36,7 @@ module.exports = (name) => {
         }
         lastTimestamp = timestamp;
     });
-};
+});
 const playersChanged = (attendees) => {
     console.log(chalk.green(attendees.join(", ")));
 };
@@ -56,14 +68,5 @@ const parseTimestamp = (line, lastParsedTimestamp) => {
     const dateTime = Date.parse(((_b = (_a = line
         .match(/\[[A-Za-z0-9: ]+\]/g)) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.replace("[", "").replace("]", "")) || new Date().toLocaleString());
     return { timestamp: dateTime, shouldParse: dateTime >= lastParsedTimestamp };
-};
-const getAttendees = (raidDate) => {
-    const raidConfig = conf.get(`raid-${raidDate}`);
-    let attendees = [];
-    if ((raidConfig === null || raidConfig === void 0 ? void 0 : raidConfig.attendees) && raidConfig.attendees.length > 0) {
-        console.log(chalk.blue.bold(`Recovered ${raidConfig.name} from previous run of the application...`));
-        attendees = raidConfig.attendees;
-    }
-    return attendees;
 };
 //# sourceMappingURL=record.js.map
