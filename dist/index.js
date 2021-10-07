@@ -9,6 +9,7 @@ const commander_1 = require("commander");
 const record_1 = __importDefault(require("./commands/record"));
 const add_1 = __importDefault(require("./commands/roster/add"));
 const remove_1 = __importDefault(require("./commands/roster/remove"));
+const calculateAttendance_1 = __importDefault(require("./commands/raids/calculateAttendance"));
 commander_1.program
     .command("record <name>")
     .description("records a new raid")
@@ -21,5 +22,9 @@ commander_1.program
     .command("roster-remove <players>")
     .description("provide a comma separated list of players to remove from our roster")
     .action(remove_1.default);
+commander_1.program
+    .command("sync")
+    .description("syncs attendance and pushes to google sheets")
+    .action(calculateAttendance_1.default);
 commander_1.program.parse();
 //# sourceMappingURL=index.js.map

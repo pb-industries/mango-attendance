@@ -29,7 +29,7 @@ const init = async (): Promise<void> => {
  *
  * @returns {Promise<sheets_v4.Sheets>}
  */
-const getSheets = async (): Promise<sheets_v4.Sheets> => {
+export const getSheets = async (): Promise<sheets_v4.Sheets> => {
   await init();
 
   if (!client || !auth) {
@@ -37,34 +37,4 @@ const getSheets = async (): Promise<sheets_v4.Sheets> => {
   }
 
   return google.sheets({ version: "v4", auth: client });
-};
-
-export const getRows = async (
-  sheetName: string,
-  range: string
-): Promise<[String[]]> => {
-  const sheets = await getSheets();
-  let parsedRange = sheetName + range ? `!${range}` : "";
-  const { data } = await sheets.spreadsheets.values.get({
-    auth: auth!,
-    spreadsheetId: process.env.GOOGLE_SHEET_ID,
-    range: parsedRange,
-  });
-
-  return data?.values as [String[]];
-};
-
-export const writeRows = async (sheetName: string) => {
-  const sheets = await getSheets();
-  let res = await sheets.spreadsheets.values.update({
-    auth: auth!,
-    spreadsheetId: process.env.GOOGLE_SHEET_ID,
-    range: sheetName,
-    valueInputOption: "RAW",
-
-    // valueInputOption: "RAW",
-    // resource: { values: [["hello", "world"]] },
-  });
-
-  console.log(res);
 };

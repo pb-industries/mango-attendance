@@ -5,6 +5,7 @@ import { program } from "commander";
 import record from "./commands/record";
 import rosterAdd from "./commands/roster/add";
 import rosterDel from "./commands/roster/remove";
+import calculateAttendance from "./commands/raids/calculateAttendance";
 
 program
   .command("record <name>")
@@ -22,5 +23,10 @@ program
     "provide a comma separated list of players to remove from our roster"
   )
   .action(rosterDel);
+
+program
+  .command("sync")
+  .description("syncs attendance and pushes to google sheets")
+  .action(calculateAttendance);
 
 program.parse();

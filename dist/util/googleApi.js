@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.writeRows = exports.getRows = void 0;
+exports.getSheets = void 0;
 const googleapis_1 = require("googleapis");
 let client = null;
 let auth;
@@ -31,26 +31,5 @@ const getSheets = () => __awaiter(void 0, void 0, void 0, function* () {
     }
     return googleapis_1.google.sheets({ version: "v4", auth: client });
 });
-const getRows = (sheetName, range) => __awaiter(void 0, void 0, void 0, function* () {
-    const sheets = yield getSheets();
-    let parsedRange = sheetName + range ? `!${range}` : "";
-    const { data } = yield sheets.spreadsheets.values.get({
-        auth: auth,
-        spreadsheetId: process.env.GOOGLE_SHEET_ID,
-        range: parsedRange,
-    });
-    return data === null || data === void 0 ? void 0 : data.values;
-});
-exports.getRows = getRows;
-const writeRows = (sheetName) => __awaiter(void 0, void 0, void 0, function* () {
-    const sheets = yield getSheets();
-    let res = yield sheets.spreadsheets.values.update({
-        auth: auth,
-        spreadsheetId: process.env.GOOGLE_SHEET_ID,
-        range: sheetName,
-        valueInputOption: "RAW",
-    });
-    console.log(res);
-});
-exports.writeRows = writeRows;
+exports.getSheets = getSheets;
 //# sourceMappingURL=googleApi.js.map
