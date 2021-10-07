@@ -97,7 +97,6 @@ const setRecordState = (line: string): boolean => {
 const extractAttendanceInfo = (line: string) => {
   const regExp = new RegExp(/\[.+\] ([a-z]+) [\(a-z\)<> ]+/gi);
   const matches = regExp.exec(line);
-  console.log(matches);
 
   return {
     player: matches?.[1] || null,
@@ -121,7 +120,6 @@ const parseTimestamp = (line: string, lastParsedTimestamp: number) => {
  * list updates.
  */
 const recordAttendance = async () => {
-  console.log(attendeeMetadata);
   const playersToRecord = Object.values(attendeeMetadata)
     .filter(({ recordedAttendance }) => recordedAttendance === false)
     .map(({ id }) => {
@@ -130,16 +128,12 @@ const recordAttendance = async () => {
 
   console.log(playersToRecord);
   if (playersToRecord.length) {
-    const rows = await getConnection()
+    await getConnection()
       .insert(playersToRecord)
       .into("player_raid")
       .onConflict(["player_id", "raid_id"])
       .merge({ updated_at: new Date() });
 
-    console.log(rows);
-
-    console.log(
-      chalk.blue("Recorded attendance for " + rows.length + " players")
-    );
+    console.log(chalk.blue("Successfully recorded attendance"));
   }
 };
