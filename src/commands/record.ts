@@ -38,7 +38,7 @@ export default async (raidName: string) => {
 
   console.log(chalk.green.bold(`Recording raid ${name}`));
 
-  new Tail("eqlog.txt", (line: string) => {
+  new Tail(process.env.LOG_FILE_PATH, (line: string) => {
     const { timestamp, shouldParse } = parseTimestamp(line, lastTimestamp);
     // We don't want to reparse the same lines
     if (!shouldParse) {
