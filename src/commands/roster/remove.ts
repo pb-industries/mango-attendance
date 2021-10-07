@@ -6,10 +6,11 @@ export default async (players: string) => {
     .split(",")
     .map((player) => player.trim().toLowerCase());
 
-  const rows = await getConnection()
+  await getConnection()
     .delete()
     .from("player")
     .whereIn("name", playersToRemove);
 
-  console.log(chalk.green.bold("Removed players", rows));
+  console.log(chalk.green.bold("Removed players"));
+  process.exit(1);
 };

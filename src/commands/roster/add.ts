@@ -8,11 +8,12 @@ export default async (players: string) => {
     };
   });
 
-  const rows = await getConnection()
+  await getConnection()
     .insert(playersToAdd)
     .into("player")
     .onConflict(["name"])
     .merge({ updated_at: new Date() });
 
-  console.log(chalk.green.bold("Inserted players", rows));
+  console.log(chalk.green.bold("Inserted players"));
+  process.exit(1);
 };

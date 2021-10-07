@@ -79,6 +79,8 @@ export default async () => {
       console.log(chalk.red("unexpected error when saving attendance"));
       await trx.rollback();
       throw e;
+    } finally {
+      process.exit(1);
     }
   });
 };
