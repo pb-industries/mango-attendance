@@ -1,4 +1,4 @@
-import { google, Auth } from "googleapis";
+import { google, Auth, sheets_v4 } from "googleapis";
 
 let client:
   | Auth.Compute
@@ -17,13 +17,7 @@ const init = async (): Promise<void> => {
   client = await auth.getClient();
 };
 
-export const getClient = async (): Promise<
-  | Auth.Compute
-  | Auth.JWT
-  | Auth.Impersonated
-  | Auth.UserRefreshClient
-  | Auth.BaseExternalAccountClient
-> => {
+export const getClient = async (): Promise<sheets_v4.Sheets> => {
   if (!client) {
     await init();
   }
@@ -32,5 +26,5 @@ export const getClient = async (): Promise<
     throw new Error("Could not instantiate google client");
   }
 
-  return client;
+  return google.sheets({ version: "v4", auth: client });
 };
