@@ -130,7 +130,7 @@ const updateSheet = async (playerAttendance: (string | number)[][]) => {
   const range = "Attendance!A2:E";
 
   const sheets = await getSheets();
-  sheets.spreadsheets.values.update(
+  await sheets.spreadsheets.values.update(
     {
       spreadsheetId,
       range,
