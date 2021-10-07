@@ -1,0 +1,28 @@
+[Wed Oct 06 19:24:25 2021] Players in EverQuest:
+[Wed Oct 06 19:24:25 2021] ---------------------------
+[Wed Oct 06 19:24:25 2021] [ANONYMOUS] Throssi <Big Natural Crits>
+[Wed Oct 06 19:24:25 2021] [ANONYMOUS] Karadin <Big Natural Crits>
+[Wed Oct 06 19:24:25 2021] [53 Mystic (Shaman)] Bassic (Troll) <Big Natural Crits> ZONE: The Skyfire Mountains (skyfire)
+[Wed Oct 06 19:24:25 2021] [58 Master (Monk)] Bassai (Iksar) <Big Natural Crits> ZONE: The Skyfire Mountains (skyfire)
+[Wed Oct 06 19:24:25 2021] [60 Warlord (Warrior)] Shug (Ogre) <Big Natural Crits> ZONE: The Skyfire Mountains (skyfire)
+[Wed Oct 06 19:24:25 2021] [60 High Priest (Cleric)] Merryn (Dark Elf) <Big Natural Crits> ZONE: The Skyfire Mountains (skyfire)
+[Wed Oct 06 19:24:25 2021] [60 Grandmaster (Monk)] Shoto (Iksar) <Big Natural Crits> ZONE: The Skyfire Mountains (skyfire)
+[Wed Oct 06 19:24:25 2021] [60 Virtuoso (Bard)] Harrison (Wood Elf) <Big Natural Crits> ZONE: The Skyfire Mountains (skyfire)
+[Wed Oct 06 19:24:25 2021] [60 Crusader (Paladin)] Welika (Erudite) <Big Natural Crits> ZONE: Velketor's Labyrinth 71 (velketor_71)
+[Wed Oct 06 19:24:25 2021] [58 Troubadour (Bard)] Bardicles (Wood Elf) <Big Natural Crits> ZONE: Velketor's Labyrinth 71 (velketor_71)
+[Wed Oct 06 19:24:25 2021] [60 Hierophant (Druid)] Decat (Half Elf) <Big Natural Crits> ZONE: Velketor's Labyrinth 71 (velketor_71)
+[Wed Oct 06 19:24:25 2021] [60 Arch Mage (Magician)] Stickie (Erudite) <Big Natural Crits> ZONE: Velketor's Labyrinth 71 (velketor_71)
+[Wed Oct 06 19:24:25 2021] [60 High Priest (Cleric)] Warent (Erudite) <Big Natural Crits> ZONE: Velketor's Labyrinth 71 (velketor_71)
+[Wed Oct 06 19:24:25 2021] There are 13 players in EverQuest.
+[Wed Oct 06 19:24:30 2021] Staccato tries to pierce a crystalline sentinel, but misses!
+[Wed Oct 06 19:24:31 2021] An Icepaw champion tries to hit a crystalline sentinel, but misses!
+[Wed Oct 06 19:24:31 2021] An Icepaw champion hits a crystalline sentinel for 75 points of damage.
+[Wed Oct 06 19:24:31 2021] Abrhum tries to pierce a crystalline sentinel, but misses!
+[Wed Oct 06 19:24:31 2021] Abrhum pierces a crystalline sentinel for 11 points of damage.
+[Wed Oct 06 19:24:31 2021] Staccato tries to pierce a crystalline sentinel, but misses!
+[Thu Oct 07 20:34:30 2021] Players in EverQuest:
+[Thu Oct 07 21:34:42 2021] [60 High Priest (Cleric)] Warent (Erudite) <Big Natural Crits> ZONE: Velketor's Labyrinth 71 (velketor_71)
+[Thu Oct 07 21:34:42 2021] [60 High Priest (Cleric)] Warent (Erudite) <Big Natural Crits> ZONE: Velketor's Labyrinth 71 (velketor_71)
+[Thu Oct 07 21:34:42 2021] [60 High Priest (Cleric)] Warent (Erudite) <Big Natural Crits> ZONE: Velketor's Labyrinth 71 (velketor_71)
+[Thu Oct 07 21:34:42 2021] [60 High Priest (Cleric)] Warent (Erudite) <Big Natural Crits> ZONE: Velketor's Labyrinth 71 (velketor_71)
+[Thu Oct 07 21:34:45 2021] There are 13 players in EverQuest.

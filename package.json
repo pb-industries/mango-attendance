@@ -1,0 +1,23 @@
+{
+  "name": "bnc-attendance",
+  "version": "1.0.0",
+  "bin": {
+    "bnc-attendance": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc && chmod 755 ./dist/index.js",
+    "record": "yarn build && ./dist/index.js record"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@types/express": "^4.17.13",
+    "chalk": "^4.1.2",
+    "commander": "^8.2.0",
+    "conf": "^10.0.3",
+    "express": "^4.17.1",
+    "googleapis": "^88.2.0",
+    "nodemon": "^2.0.13",
+    "tail-file": "^1.4.14",
+    "types": "^0.1.1"
+  }
+}
