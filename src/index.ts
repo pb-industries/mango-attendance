@@ -17,7 +17,7 @@ program
   .action(rosterAdd);
 
 program
-  .command("roster-del <players>")
+  .command("roster-remove <players>")
   .description(
     "provide a comma separated list of players to remove from our roster"
   )

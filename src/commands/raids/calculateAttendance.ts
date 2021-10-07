@@ -2,10 +2,10 @@ import { getConnection } from "../../util/db";
 
 export default async (
   raidName: string
-): Promise<{ id: number; name: string; date: string }> => {
+): Promise<{ name: string; date: string }> => {
   const date = new Date().toLocaleDateString();
 
-  const raids = await getConnection()
+  await getConnection()
     .insert({
       name: raidName.toLowerCase(),
       created_at: date,
@@ -16,5 +16,5 @@ export default async (
     .merge({ updated_at: new Date(), name: raidName })
     .returning("*");
 
-  return { id: raids[0]?.id, name: `${raidName}@${date}`, date };
+  return { name: `${raidName}@${date}`, date };
 };

@@ -18,7 +18,7 @@ commander_1.program
     .description("provide a comma separated list of players to add to our roster")
     .action(add_1.default);
 commander_1.program
-    .command("roster-del <players>")
+    .command("roster-remove <players>")
     .description("provide a comma separated list of players to remove from our roster")
     .action(remove_1.default);
 commander_1.program.parse();

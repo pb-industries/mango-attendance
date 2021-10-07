@@ -8,23 +8,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_1 = require("../../util/db");
-const chalk_1 = __importDefault(require("chalk"));
-exports.default = (players) => __awaiter(void 0, void 0, void 0, function* () {
-    const playersToAdd = players.split(",").map((player) => {
-        return {
-            name: player.trim().toLowerCase(),
-        };
-    });
-    const rows = yield (0, db_1.getConnection)()
-        .insert(playersToAdd)
-        .into("player")
-        .onConflict(["name"])
-        .merge({ updated_at: new Date() });
-    console.log(chalk_1.default.green.bold("Inserted players", rows));
+exports.default = (raidName) => __awaiter(void 0, void 0, void 0, function* () {
+    const date = new Date().toLocaleDateString();
+    yield (0, db_1.getConnection)()
+        .insert({
+        name: raidName.toLowerCase(),
+        created_at: date,
+        updated_at: date,
+    })
+        .into("raid")
+        .onConflict(["created_at"])
+        .merge({ updated_at: new Date(), name: raidName })
+        .returning("*");
+    return { name: `${raidName}@${date}`, date };
 });
-//# sourceMappingURL=add.js.map
+//# sourceMappingURL=calculateAttendance.js.map

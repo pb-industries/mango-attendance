@@ -1,7 +1,6 @@
 module.exports = {
   up: async function (knex) {
     return knex.schema.createTable("player_raid", (table) => {
-      table.increments("id").primary();
       table
         .integer("player_id")
         .notNullable()
@@ -10,6 +9,8 @@ module.exports = {
       table.integer("raid_id").notNullable().references("id").inTable("raid");
       table.timestamp("created_at").defaultTo(knex.fn.now());
       table.timestamp("updated_at").defaultTo(knex.fn.now());
+
+      table.primary(["player_id", "raid_id"]);
     });
   },
   down: async function (knex) {

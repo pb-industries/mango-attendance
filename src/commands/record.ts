@@ -1,14 +1,40 @@
-const chalk = require("chalk");
-const Tail = require("tail-file");
+import chalk from "chalk";
+// @ts-ignore
+import Tail from "tail-file";
+import { debounce } from "lodash";
+import { getConnection } from "../util/db";
 import addRaid from "./raids/add";
 
+let raid_id: number | null = null;
 let recording = false;
+let attendees: string[] = [];
+let attendeeMetadata: {
+  [key: string]: { id: number; recordedAttendance: boolean };
+} = {};
 // let currentZone = null;
+const fetchPlayers = async () => {
+  const players = await getConnection()
+    .select(["id", "name"])
+    .from("player")
+    .whereIn("name", attendees);
+
+  players.forEach((player) => {
+    if (!attendeeMetadata[player.name.toLowerCase()]) {
+      attendeeMetadata[player.name.toLowerCase()] = {
+        id: player.id,
+        recordedAttendance: false,
+      };
+    }
+  });
+
+  await recordAttendance();
+};
+const fetchPlayersDebounced = debounce(fetchPlayers, 2000);
 
 export default async (raidName: string) => {
   let lastTimestamp: number = 0;
-  const { name } = await addRaid(raidName);
-  const attendees: string[] = [];
+  const { id, name } = await addRaid(raidName);
+  raid_id = id;
 
   console.log(chalk.green.bold(`Recording raid ${name}`));
 
@@ -26,17 +52,13 @@ export default async (raidName: string) => {
       // Later lets extract zone info so we can check if the player is in the raid
       const { player } = extractAttendanceInfo(line);
       if (player && !attendees.includes(player)) {
-        attendees.push(player);
-        playersChanged(attendees);
+        attendees.push(player.toLowerCase());
+        fetchPlayersDebounced();
       }
     }
 
     lastTimestamp = timestamp;
   });
-};
-
-const playersChanged = (attendees: string[]) => {
-  console.log(chalk.green(attendees.join(", ")));
 };
 
 /**
@@ -95,4 +117,32 @@ const parseTimestamp = (line: string, lastParsedTimestamp: number) => {
 
   // Don't re-parse lines we've already parsed
   return { timestamp: dateTime, shouldParse: dateTime >= lastParsedTimestamp };
+};
+
+/**
+ * Given a list of players, record their attendance each time the player
+ * list updates.
+ */
+const recordAttendance = async () => {
+  console.log(attendeeMetadata);
+  const playersToRecord = Object.values(attendeeMetadata)
+    .filter(({ recordedAttendance }) => recordedAttendance === false)
+    .map(({ id }) => {
+      return { raid_id, player_id: id };
+    });
+
+  console.log(playersToRecord);
+  if (playersToRecord.length) {
+    const rows = await getConnection()
+      .insert(playersToRecord)
+      .into("player_raid")
+      .onConflict(["player_id", "raid_id"])
+      .merge({ updated_at: new Date() });
+
+    console.log(rows);
+
+    console.log(
+      chalk.blue("Recorded attendance for " + rows.length + " players")
+    );
+  }
 };

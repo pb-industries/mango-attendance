@@ -11,19 +11,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_1 = require("../../util/db");
 exports.default = (raidName) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const date = new Date().toLocaleDateString();
-    const rows = yield (0, db_1.getConnection)()
+    const raids = yield (0, db_1.getConnection)()
         .insert({
-        name: raidName,
+        name: raidName.toLowerCase(),
         created_at: date,
         updated_at: date,
-        deleted_at: null,
     })
-        .into("raids")
+        .into("raid")
         .onConflict(["created_at"])
         .merge({ updated_at: new Date(), name: raidName })
         .returning("*");
-    console.log("added raid: ", rows);
-    return { name: `${raidName}@${date}`, date };
+    return { id: (_a = raids[0]) === null || _a === void 0 ? void 0 : _a.id, name: `${raidName}@${date}`, date };
 });
 //# sourceMappingURL=add.js.map

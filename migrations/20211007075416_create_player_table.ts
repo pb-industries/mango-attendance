@@ -9,6 +9,8 @@ module.exports = {
       table.integer("attendnace_life").nullable();
       table.timestamp("created_at").defaultTo(knex.fn.now());
       table.timestamp("updated_at").defaultTo(knex.fn.now());
+
+      table.unique("name");
     });
   },
   down: async function (knex) {
