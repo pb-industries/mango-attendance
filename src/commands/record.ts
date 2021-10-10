@@ -77,7 +77,8 @@ const setRecordState = (line: string): boolean => {
   }
 
   if (
-    line.match(/(There are ([0-9]+) players in EverQuest.)/gi)?.length === 1
+    line.match(/(There are ([0-9]+) players in EverQuest.)/gi)?.length === 1 ||
+    line.match(/There is 1 player in EverQuest./gi)?.length === 1
   ) {
     console.log(chalk.red.bold("Recording ended..."));
     recording = false;
