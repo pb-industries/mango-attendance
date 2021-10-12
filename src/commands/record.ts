@@ -31,7 +31,7 @@ const fetchPlayers = async () => {
 const fetchPlayersDebounced = debounce(fetchPlayers, 2000);
 
 export default async (raidName: string) => {
-  let lastTimestamp: number = 0;
+  let lastTimestamp: number = new Date().getTime();
   const { id, name } = await addRaid(raidName);
   raid_id = id;
 
