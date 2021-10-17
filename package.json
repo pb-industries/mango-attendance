@@ -2,7 +2,7 @@
   "name": "bnc-attendance",
   "version": "1.0.0",
   "bin": {
-    "bnc-attendance": "./dist/index.js"
+    "bnc": "./dist/index.js"
   },
   "scripts": {
     "build": "rm -rf dist && tsc && chmod 755 ./dist/index.js",
