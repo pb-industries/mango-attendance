@@ -61,17 +61,38 @@ export default async () => {
         attendance.attendance_life,
       ]);
 
-      console.log(sheetRows);
-
       return trx("player")
         .update(attendance)
         .where({ id: player_id })
         .transacting(trx);
     });
 
+    // In order to emulate replacing the whole sheet, insert a bunch of blank
+    // cells incase members are ever removed
+    const blankRows = 10;
+    for (let j = blankRows; j > 0; j--) {
+      sheetRows.push(["", 0, 0, 0, 0]);
+    }
+
     try {
       await Promise.all(updates);
       await trx.commit();
+      console.table(
+        sheetRows
+          .map((row) => {
+            return {
+              player_name: row?.[0],
+              attendance_30: `${row?.[1]}%`,
+              attendance_60: `${row?.[2]}%`,
+              attendance_90: `${row?.[3]}%`,
+              attendance_life: `${row?.[4]}%`,
+            };
+          })
+          .filter((row) => {
+            return row.player_name !== "";
+          })
+      );
+
       console.log(
         chalk.green.bold(`Successfully updated attendance of all members.`)
       );
