@@ -7,7 +7,7 @@ export const getConnection = () => {
   if (!connection) {
     console.log("Spawning new connection");
     connection = knex({
-      client: "pg",
+      client: "mysql2",
       connection: __db__,
       debug: __db__.debug,
     });

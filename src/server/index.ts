@@ -1,3 +1,6 @@
+require("dotenv").config();
+
+import { getConnection } from "../util/db";
 import express from "express";
 import pino from "express-pino-logger";
 import record from "../commands/record";
@@ -22,7 +25,11 @@ app.post('/raid', async (req, res) => {
     res.json(raidInfo);
 })
 
-app.listen(__port__, () => {
+app.listen(__port__, async () => {
     console.log(`Listening on port ${__port__}`);
+  await getConnection()
+    .select(["id", "name"])
+    .from("player")
+    .whereIn("name", ["karadin"]);
 })
 

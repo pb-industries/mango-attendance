@@ -24,9 +24,9 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "types": [],
-    "paths": {
-      "@/*": ["src/*"]
-    }
+    // "paths": {
+    //   "@/*": ["src/*"]
+    // }
   },
   "exclude": ["node_modules", "src/util/googleApi.ts"],
   "include": ["src/**/*.ts"]
