@@ -1,4 +1,5 @@
 export const __prod__ = process.env.NODE_ENV === "production";
+export const __port__ = process.env.APP_PORT || 3000;
 export const __db__ = {
   host: process.env.DB_HOST || "localhost",
   user: process.env.DB_USER || "postgres",

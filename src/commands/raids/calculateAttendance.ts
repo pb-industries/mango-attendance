@@ -1,7 +1,7 @@
 import { Knex } from "knex";
 import { getConnection } from "../../util/db";
 import chalk from "chalk";
-import { getSheets } from "../../util/googleApi";
+// import { getSheets } from "../../util/googleApi";
 
 type Attendance =
   | "attendance_life"
@@ -73,7 +73,7 @@ export default async () => {
       console.log(
         chalk.green.bold(`Successfully updated attendance of all members.`)
       );
-      await updateSheet(sheetRows);
+      // await updateSheet(sheetRows);
     } catch (e) {
       console.log(e);
       console.log(chalk.red("unexpected error when saving attendance"));
@@ -123,30 +123,30 @@ const daysInRange = async (
     .groupBy(conn.raw("pr.player_id, p.name"));
 };
 
-const updateSheet = async (playerAttendance: (string | number)[][]) => {
-  const spreadsheetId = process.env.GOOGLE_SHEET_ID;
-  const range = "Attendance!A2:E";
+// const updateSheet = async (playerAttendance: (string | number)[][]) => {
+//   const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+//   const range = "Attendance!A2:E";
 
-  const sheets = await getSheets();
-  sheets.spreadsheets.values.update(
-    {
-      spreadsheetId,
-      range,
-      valueInputOption: "USER_ENTERED",
-      // @ts-ignore
-      resource: {
-        values: playerAttendance,
-      },
-    },
-    (err: any) => {
-      if (err) {
-        console.log(chalk.red(`The API returned an error: ${err}`));
-        return;
-      } else {
-        console.log(
-          chalk.green.bold(`Successfully updated attendance spreadsheet.`)
-        );
-      }
-    }
-  );
-};
+//   const sheets = await getSheets();
+//   sheets.spreadsheets.values.update(
+//     {
+//       spreadsheetId,
+//       range,
+//       valueInputOption: "USER_ENTERED",
+//       // @ts-ignore
+//       resource: {
+//         values: playerAttendance,
+//       },
+//     },
+//     (err: any) => {
+//       if (err) {
+//         console.log(chalk.red(`The API returned an error: ${err}`));
+//         return;
+//       } else {
+//         console.log(
+//           chalk.green.bold(`Successfully updated attendance spreadsheet.`)
+//         );
+//       }
+//     }
+//   );
+// };
