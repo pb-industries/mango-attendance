@@ -9,7 +9,5 @@ services:
     ports:
       - 5002:5002
     volumes:
-      - ./:/app
-      - /app/node_modules/
-      - /app/dist/
+      - ./src:/app/src
     restart: always

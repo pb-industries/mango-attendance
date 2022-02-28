@@ -7,10 +7,9 @@
   "scripts": {
     "cli": "node ./dist/cli/index.js",
     "build": "rm -rf dist && tsc && chmod 755 ./dist/cli/index.js",
-    "record": "yarn build && ./dist/index.js record",
     "rebuild": "yarn build && yarn start",
-    "start": "yarn dist/server/index.js",
-    "dev": "npx tsc-watch --onSuccess \"yarn rebuild\" | npx pino-pretty"
+    "start": "node ./dist/server/index.js",
+    "dev": "yarn tsc-watch --onSuccess \"yarn rebuild\" | pino-pretty"
   },
   "license": "MIT",
   "dependencies": {
