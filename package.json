@@ -9,12 +9,13 @@
     "build": "rm -rf dist && tsc && chmod 755 ./dist/cli/index.js",
     "record": "yarn build && ./dist/index.js record",
     "rebuild": "yarn build && yarn start",
-    "start": "node dist/server/index.js",
-    "dev": "tsc-watch --onSuccess \"yarn rebuild\" | pino-pretty"
+    "start": "yarn dist/server/index.js",
+    "dev": "npx tsc-watch --onSuccess \"yarn rebuild\" | npx pino-pretty"
   },
   "license": "MIT",
   "dependencies": {
     "chalk": "^4.1.2",
+    "cockroachdb": "^1.0.3",
     "commander": "^8.2.0",
     "conf": "^10.0.3",
     "dotenv": "^10.0.0",
@@ -22,7 +23,7 @@
     "express-pino-logger": "^7.0.0",
     "googleapis": "^88.2.0",
     "knex": "^0.95.11",
-    "mysql2": "^2.3.3",
+    "pg": "^8.7.3",
     "pino": "^7.8.0",
     "tail-file": "^1.4.14"
   },

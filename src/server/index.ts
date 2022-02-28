@@ -1,9 +1,9 @@
-require("dotenv").config();
 
-import { getConnection } from "../util/db";
+import 'dotenv/config'
+
 import express from "express";
 import pino from "express-pino-logger";
-import record from "../commands/record";
+import add from '../commands/raids/add';
 import { __port__ } from '../constants'
 
 const app = express();
@@ -18,18 +18,25 @@ app.use((_req, res, next) => {
   next();
 });
 
-app.post('/raid', async (req, res) => {
+app.post('raid', async (req, res) => {
+  console.log('here')
+  res.send({ 'message': 'done '})
     const { name } = req.body;
-    const raidInfo = await record(name)
+    console.log(name)
+    if (!name) {
+      res.status(400).send('Missing raid name');
+    } else {
+      const { id, name: raidName, date } = await add(name);
+      res.status(200).send({ id, name: `${raidName}@${date}` });
+    }
+})
 
-    res.json(raidInfo);
+app.get('raids', async (_, res) => {
+  console.log('here')
+  res.send({ 'message': 'done '})
 })
 
 app.listen(__port__, async () => {
     console.log(`Listening on port ${__port__}`);
-  await getConnection()
-    .select(["id", "name"])
-    .from("player")
-    .whereIn("name", ["karadin"]);
 })
 

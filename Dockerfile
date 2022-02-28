@@ -1,4 +1,4 @@
-FROM node:17-alpine3.15 AS builder
+FROM node:17-alpine3.15
 
 WORKDIR /app
 
@@ -6,22 +6,6 @@ COPY package.json .
 COPY yarn.lock .
 COPY tsconfig.json .
 
-RUN yarn
-COPY . .
-RUN yarn build
+RUN yarn install --production=false
 
-# Stage 2
-# Copy built assets to run here.
-FROM node:17-alpine3.15
-
-WORKDIR /app
-
-COPY --from=0 /app/dist ./dist
-COPY --from=0 /app/package.json .
-COPY --from=0 /app/yarn.lock .
-
-RUN yarn --prod
-
-CMD ["node", "./dist/index.js"]
-
-EXPOSE 80
+CMD ["yarn", "dev"]

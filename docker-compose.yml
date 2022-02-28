@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  bnc-attendance:
+    container_name: bnc-attendance
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    ports:
+      - 5002:5002
+    volumes:
+      - ./:/app
+      - /app/node_modules/
+      - /app/dist/
+    restart: always

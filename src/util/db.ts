@@ -7,9 +7,13 @@ export const getConnection = () => {
   if (!connection) {
     console.log("Spawning new connection");
     connection = knex({
-      client: "mysql2",
+      client: "pg",
+      version: "21.2.4",
       connection: __db__,
       debug: __db__.debug,
+      migrations: {
+        directory: '../../migrations'
+      }
     });
   }
 
