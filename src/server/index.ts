@@ -4,7 +4,9 @@ import 'dotenv/config'
 import express from "express";
 import expressPino from "express-pino-logger";
 import pino from 'pino'
-import add from '../commands/raids/add';
+import fetchRaid from '../commands/raids/fetch';
+import addRaid from '../commands/raids/add';
+import deleteRaid from '../commands/raids/delete'
 import { __port__ } from '../constants'
 
 const app = express();
@@ -20,21 +22,28 @@ app.use((_req, res, next) => {
 });
 
 app.post('/raid', async (req, res) => {
-  console.log('here')
-  res.send({ 'message': 'done '})
     const { name } = req.body;
-    console.log(name)
     if (!name) {
       res.status(400).send('Missing raid name');
     } else {
-      const { id, name: raidName, date } = await add(name);
+      const { id, name: raidName, date } = await addRaid(name);
       res.status(200).send({ id, name: `${raidName}@${date}` });
     }
 })
 
-app.get('/raids', async (_, res) => {
-  console.log('here')
-  res.send({ 'message': 'done '})
+app.delete('/raid', async (req, res) => {
+    const { id } = req.body;
+    if (!id) {
+      res.status(400).send('Missing raid id');
+    } else {
+      res.status(200).send(await deleteRaid(id));
+    }
+})
+
+app.get('/raid', async (req, res) => {
+    const { cursor, direction, pageSize } = req.query as any as Page;
+    const raids = await fetchRaid(cursor ?? 0, direction ?? 'asc', pageSize ?? 20);
+    res.send(raids)
 })
 
 app.listen(__port__, async () => {
