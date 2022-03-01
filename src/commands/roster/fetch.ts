@@ -6,24 +6,24 @@ export default async (
   pageSize: number,
   id?: number
 ): Promise<Page> => {
-  let raids = [];
+  let players = [];
   if (id) {
-    raids = await getConnection()
+    players = await getConnection()
       .select('*')
-      .from('raid')
+      .from('player')
       .where('id', id)
       .first();
   } else {
-    raids = await getConnection()
+    players = await getConnection()
       .select('*')
-      .from('raid')
+      .from('player')
       .where(`id`, `${direction === 'asc' ? '>' : '<'}`, `${cursor}`)
       .limit(pageSize);
   }
 
   return {
-    data: raids,
-    totalRows: raids.length,
+    data: players,
+    totalRows: players.length,
     cursor,
     direction,
     pageSize,

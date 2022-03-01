@@ -1,13 +1,13 @@
-import { Knex } from "knex";
-import { getConnection } from "../../util/db";
-import chalk from "chalk";
+import { Knex } from 'knex';
+import { log } from '../../logger';
+import { getConnection } from '../../util/db';
 // import { getSheets } from "../../util/googleApi";
 
 type Attendance =
-  | "attendance_life"
-  | "attendance_30"
-  | "attendance_60"
-  | "attendance_90";
+  | 'attendance_life'
+  | 'attendance_30'
+  | 'attendance_60'
+  | 'attendance_90';
 
 interface AttendanceDatum {
   player_id: number;
@@ -21,10 +21,10 @@ export default async () => {
     [key: number]: { [key: string]: number | string };
   } = {};
   const attendanceData: { name: Attendance; data: AttendanceDatum[] }[] = [
-    { name: "attendance_life", data: await allTime(conn) },
-    { name: "attendance_30", data: await daysInRange(conn, 30) },
-    { name: "attendance_60", data: await daysInRange(conn, 60) },
-    { name: "attendance_90", data: await daysInRange(conn, 90) },
+    { name: 'attendance_life', data: await allTime(conn) },
+    { name: 'attendance_30', data: await daysInRange(conn, 30) },
+    { name: 'attendance_60', data: await daysInRange(conn, 60) },
+    { name: 'attendance_90', data: await daysInRange(conn, 90) },
   ];
 
   attendanceData.forEach(({ name, data }) => {
@@ -61,7 +61,7 @@ export default async () => {
         attendance.attendance_life,
       ]);
 
-      return trx("player")
+      return trx('player')
         .update(attendance)
         .where({ id: player_id })
         .transacting(trx);
@@ -70,13 +70,11 @@ export default async () => {
     try {
       await Promise.all(updates);
       await trx.commit();
-      console.log(
-        chalk.green.bold(`Successfully updated attendance of all members.`)
-      );
+      log.info(`Successfully updated attendance of all members.`);
       // await updateSheet(sheetRows);
     } catch (e) {
-      console.log(e);
-      console.log(chalk.red("unexpected error when saving attendance"));
+      log.error(e);
+      log.error('unexpected error when saving attendance');
       await trx.rollback();
       throw e;
     }
@@ -89,15 +87,15 @@ const allTime = async (
   return await conn
     .select(
       conn.raw(
-        "p.name AS player_name, pr.player_id, round((cast(count(distinct pr.raid_id) as decimal) / cast(count(distinct all_raids.raid_id) as decimal) * 100), 2) AS attendance"
+        'p.name AS player_name, pr.player_id, round((cast(count(distinct pr.raid_id) as decimal) / cast(count(distinct all_raids.raid_id) as decimal) * 100), 2) AS attendance'
       )
     )
-    .from(conn.raw("player_raid AS pr"))
+    .from(conn.raw('player_raid AS pr'))
     .innerJoin(
-      conn.raw("player_raid AS all_raids ON all_raids.raid_id IS NOT NULL")
+      conn.raw('player_raid AS all_raids ON all_raids.raid_id IS NOT NULL')
     )
-    .leftJoin(conn.raw("player AS p ON pr.player_id = p.id"))
-    .groupBy(conn.raw("pr.player_id, p.name"));
+    .leftJoin(conn.raw('player AS p ON pr.player_id = p.id'))
+    .groupBy(conn.raw('pr.player_id, p.name'));
 };
 
 const daysInRange = async (
@@ -107,20 +105,20 @@ const daysInRange = async (
   return await conn
     .select(
       conn.raw(
-        "p.name AS player_name, pr.player_id, round((cast(count(distinct pr.raid_id) as decimal) / cast(count(distinct all_raids.raid_id) as decimal) * 100), 2) AS attendance"
+        'p.name AS player_name, pr.player_id, round((cast(count(distinct pr.raid_id) as decimal) / cast(count(distinct all_raids.raid_id) as decimal) * 100), 2) AS attendance'
       )
     )
-    .from(conn.raw("player_raid AS pr"))
+    .from(conn.raw('player_raid AS pr'))
     .innerJoin(
       conn.raw(
         `player_raid AS all_raids ON all_raids.raid_id IS NOT NULL AND all_raids.created_at > current_timestamp - interval '${days}' day`
       )
     )
-    .leftJoin(conn.raw("player AS p ON pr.player_id = p.id"))
+    .leftJoin(conn.raw('player AS p ON pr.player_id = p.id'))
     .where(
       conn.raw(`pr.created_at > current_timestamp - interval '${days}' day`)
     )
-    .groupBy(conn.raw("pr.player_id, p.name"));
+    .groupBy(conn.raw('pr.player_id, p.name'));
 };
 
 // const updateSheet = async (playerAttendance: (string | number)[][]) => {

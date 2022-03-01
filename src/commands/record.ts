@@ -1,22 +1,22 @@
-import chalk from "chalk";
 // @ts-ignore
-import Tail from "tail-file";
-import { debounce } from "lodash";
-import { getConnection } from "../util/db";
-import addRaid from "./raids/add";
+import Tail from 'tail-file';
+import { debounce } from 'lodash';
+import { getConnection } from '../util/db';
+import addRaid from './raids/add';
+import { log } from '../logger';
 
 let raid_id: number | null = null;
 let recording = false;
-let attendees: string[] = [];
-let attendeeMetadata: {
+const attendees: string[] = [];
+const attendeeMetadata: {
   [key: string]: { id: number; recordedAttendance: boolean };
 } = {};
 // let currentZone = null;
 const fetchPlayers = async () => {
   const players = await getConnection()
-    .select(["id", "name"])
-    .from("player")
-    .whereIn("name", attendees);
+    .select(['id', 'name'])
+    .from('player')
+    .whereIn('name', attendees);
 
   players.forEach((player) => {
     if (!attendeeMetadata[player.name.toLowerCase()]) {
@@ -32,11 +32,11 @@ const fetchPlayers = async () => {
 const fetchPlayersDebounced = debounce(fetchPlayers, 2000);
 
 export default async (raidName: string) => {
-  let lastTimestamp: number = 0;
+  let lastTimestamp = 0;
   const { id, name } = await addRaid(raidName);
   raid_id = id;
 
-  console.log(chalk.green.bold(`Recording raid ${name}`));
+  log.info(`Recording raid ${name}`);
 
   new Tail(process.env.LOG_FILE_PATH, (line: string) => {
     const { timestamp, shouldParse } = parseTimestamp(line, lastTimestamp);
@@ -72,7 +72,7 @@ export default async (raidName: string) => {
  */
 const setRecordState = (line: string): boolean => {
   if (line.match(/(Players in EverQuest:)/gi)?.length === 1) {
-    console.log(chalk.yellow.bold("Recording started..."));
+    log.info('Recording started...');
     recording = true;
     return false;
   }
@@ -80,7 +80,7 @@ const setRecordState = (line: string): boolean => {
   if (
     line.match(/(There are ([0-9]+) players in EverQuest.)/gi)?.length === 1
   ) {
-    console.log(chalk.red.bold("Recording ended..."));
+    log.info('Recording ended...');
     recording = false;
     return false;
   }
@@ -103,7 +103,7 @@ const extractAttendanceInfo = (line: string) => {
 
   return {
     player: matches?.[1] || null,
-    zone: matches?.[2]?.replace("(", "").replace(")", "") || null,
+    zone: matches?.[2]?.replace('(', '').replace(')', '') || null,
   };
 };
 
@@ -111,8 +111,8 @@ const parseTimestamp = (line: string, lastParsedTimestamp: number) => {
   const dateTime = Date.parse(
     line
       .match(/\[[A-Za-z0-9: ]+\]/g)?.[0]
-      ?.replace("[", "")
-      .replace("]", "") || new Date().toLocaleString()
+      ?.replace('[', '')
+      .replace(']', '') || new Date().toLocaleString()
   );
 
   // Don't re-parse lines we've already parsed
@@ -124,25 +124,22 @@ const parseTimestamp = (line: string, lastParsedTimestamp: number) => {
  * list updates.
  */
 const recordAttendance = async () => {
-  console.log(attendeeMetadata);
   const playersToRecord = Object.values(attendeeMetadata)
     .filter(({ recordedAttendance }) => recordedAttendance === false)
     .map(({ id }) => {
-      return { raid_id, player_id: id };
+      return { raid_id, player_id: id, raid_hour: new Date().getHours() + 1 };
     });
 
   console.log(playersToRecord);
   if (playersToRecord.length) {
     const rows = await getConnection()
       .insert(playersToRecord)
-      .into("player_raid")
-      .onConflict(["player_id", "raid_id"])
+      .into('player_raid')
+      .onConflict(['player_id', 'raid_id', 'raid_hour'])
       .merge({ updated_at: new Date() });
 
-    console.log(rows);
+    log.debug(rows);
 
-    console.log(
-      chalk.blue("Recorded attendance for " + rows.length + " players")
-    );
+    log.info('Recorded attendance for ' + rows.length + ' players');
   }
 };

@@ -1,0 +1,17 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint", "prettier", "no-loops"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
+  ],
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "off",
+    "no-console": 1, // Means warning
+    "prettier/prettier": 2, // Means error
+    "no-loops/no-loops": 2 // If while or foreach are used, throw an error - use map/reduce etc instead.
+  }
+}

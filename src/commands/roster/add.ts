@@ -1,18 +1,19 @@
-import { getConnection } from "../../util/db";
-import chalk from "chalk";
+import { log } from '../../logger';
+import { getConnection } from '../../util/db';
 
-export default async (players: string) => {
-  const playersToAdd = players.split(",").map((player) => {
+export default async (players: Player[]) => {
+  const playersToAdd = players.map((player) => {
     return {
-      name: player.trim().toLowerCase(),
+      name: player?.name?.toLowerCase(),
+      ...player,
     };
   });
 
   const rows = await getConnection()
     .insert(playersToAdd)
-    .into("player")
-    .onConflict(["name"])
+    .into('player')
+    .onConflict(['name'])
     .merge({ updated_at: new Date() });
 
-  console.log(chalk.green.bold("Inserted players", rows));
+  log.info('Inserted players', rows);
 };

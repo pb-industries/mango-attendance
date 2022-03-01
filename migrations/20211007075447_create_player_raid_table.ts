@@ -1,19 +1,20 @@
 module.exports = {
   up: async function (knex) {
-    return knex.schema.createTable("player_raid", (table) => {
+    return knex.schema.createTable('player_raid', (table) => {
       table
-        .integer("player_id")
+        .integer('player_id')
         .notNullable()
-        .references("id")
-        .inTable("player");
-      table.integer("raid_id").notNullable().references("id").inTable("raid");
-      table.timestamp("created_at").defaultTo(knex.fn.now());
-      table.timestamp("updated_at").defaultTo(knex.fn.now());
+        .references('id')
+        .inTable('player');
+      table.integer('raid_id').notNullable().references('id').inTable('raid');
+      table.integer('raid_hour').notNullable();
+      table.timestamp('created_at').defaultTo(knex.fn.now());
+      table.timestamp('updated_at').defaultTo(knex.fn.now());
 
-      table.primary(["player_id", "raid_id"]);
+      table.primary(['player_id', 'raid_id', 'raid_hour']);
     });
   },
   down: async function (knex) {
-    return knex.schema.dropTable("player_raid");
+    return knex.schema.dropTable('player_raid');
   },
 };
