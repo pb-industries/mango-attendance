@@ -1,13 +1,9 @@
 {
   "name": "bnc-attendance",
   "version": "1.0.0",
-  "bin": {
-    "bnc-attendance": "./dist/cli/index.js"
-  },
   "scripts": {
-    "cli": "node ./dist/cli/index.js",
     "lint": "eslint . --ext .ts",
-    "build": "rm -rf dist && tsc && chmod 755 ./dist/cli/index.js",
+    "build": "rm -rf dist && tsc",
     "rebuild": "yarn build && yarn start",
     "start": "node ./dist/server/index.js",
     "dev": "yarn tsc-watch --onSuccess \"yarn rebuild\" | pino-pretty"

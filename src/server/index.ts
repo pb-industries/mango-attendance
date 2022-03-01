@@ -6,6 +6,8 @@ import fetchRaid from '../commands/raids/fetch';
 import addRaid from '../commands/raids/add';
 import deleteRaid from '../commands/raids/delete';
 import fetchRoster from '../commands/roster/fetch';
+import addAlt from '../commands/roster/add-alt';
+import addPlayer from '../commands/roster/add';
 import { __port__ } from '../constants';
 import { log } from '../logger';
 
@@ -62,6 +64,40 @@ app.get('/roster', async (req, res) => {
     id
   );
   res.send(roster);
+});
+
+app.post('/roster', async (req, res) => {
+  const { players } = req.body as { players: Player[] };
+  if (!players) {
+    res.status(400).send('Missing players');
+  } else {
+    try {
+      res.send({ data: await addPlayer(players) });
+    } catch (e) {
+      log.error(e);
+      res.status(500).send(e.message);
+    }
+  }
+});
+
+app.post('/roster/alt', async (req, res) => {
+  let { main_id, alt_ids } = req.body;
+  if (!alt_ids) {
+    res.status(400).send('Missing alt ids');
+  } else if (!main_id) {
+    res.status(400).send('Missing main id');
+  } else {
+    if (typeof alt_ids === 'string') {
+      alt_ids = alt_ids.split(',').map((id) => id);
+    }
+
+    res.send({
+      data: await addAlt(
+        `${main_id}`,
+        alt_ids.map((id: any) => `${id}`)
+      ),
+    });
+  }
 });
 
 app.listen(__port__, async () => {

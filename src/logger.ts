@@ -1,6 +1,6 @@
 import Pino from 'pino';
 
-const logger = Pino({ level: process.env.LOG_LEVEL ?? 'info' });
+const logger = Pino();
 
 /**
  * By default, we run the application in error mode.
