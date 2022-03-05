@@ -5,9 +5,13 @@ import expressPino from 'express-pino-logger';
 import fetchRaid from '../commands/raids/fetch';
 import addRaid from '../commands/raids/add';
 import deleteRaid from '../commands/raids/delete';
+import calculateAttendance from '../commands/raids/calculate-attendance';
+import recordTick from '../commands/raids/record-tick';
 import fetchRoster from '../commands/roster/fetch';
 import addAlt from '../commands/roster/add-alt';
 import addPlayer from '../commands/roster/add';
+import addRaffle from '../commands/raffle/add';
+import fetchRaffleRolls from '../commands/raffle/fetch-roll';
 import { __port__ } from '../constants';
 import { log } from '../logger';
 
@@ -29,8 +33,22 @@ app.post('/raid', async (req, res) => {
   if (!name) {
     res.status(400).send('Missing raid name');
   } else {
-    const { id, name: raidName, date } = await addRaid(name, parseInt(split));
-    res.status(200).send({ id, name: `${raidName}@${date}`, split });
+    const data = await addRaid(name, parseInt(split));
+    res.status(200).send({ ...data, split });
+  }
+});
+
+app.post('/raid/tick', async (req, res) => {
+  let { raid_id, player_names } = req.body;
+  if (!raid_id || !player_names) {
+    res.status(400).send('Missing raid id or player names');
+  } else {
+    if (typeof player_names === 'string') {
+      player_names = player_names.split(',');
+    }
+    const tickResult = await recordTick(raid_id, player_names);
+    await calculateAttendance();
+    res.status(200).send({ data: { tick_result: tickResult } });
   }
 });
 
@@ -52,6 +70,39 @@ app.get('/raid', async (req, res) => {
     id
   );
   res.send(raids);
+});
+
+// RAFFLE endpoints
+app.get('/raffle/tickets', async (req, res) => {
+  let { raffle_id, player_ids } = req.body;
+  if (!raffle_id || !player_ids) {
+    res.status(400).send('Missing raffle id or player ids');
+  } else {
+    if (typeof player_ids === 'string') {
+      player_ids = player_ids.split(',').map((id) => `${id}`);
+    }
+    res.status(200).send(await fetchRaffleRolls(raffle_id, player_ids));
+  }
+});
+
+app.post('/raffle', async (req, res) => {
+  const { raid_id, item_name, roll_symbol } = req.body;
+  if (!raid_id || !item_name || !roll_symbol) {
+    res.status(400).send('Missing raid id, item name, or roll symbol');
+  } else {
+    const raffleId = await addRaffle(raid_id, item_name, roll_symbol);
+    res.status(200).send({ data: { raffle_id: raffleId } });
+  }
+});
+
+app.post('/raffle/{raffleId}', (req, res) => {
+  const { raffle_id } = req.query;
+  if (!raffle_id) {
+    res.status(400).send('Missing raffle id');
+  } else {
+    // TODO implement setting the winner
+    res.status(200).send({ data: { raffle_id: raffle_id } });
+  }
 });
 
 // ROSTER endpoints

@@ -1,7 +1,7 @@
 module.exports = {
   up: async function (knex) {
     return knex.schema.table('raid', (table) => {
-      table.integer('split').notNullable().defaultTo(1);
+      table.string('split').notNullable().defaultTo('1');
       table.unique(['created_at', 'split']);
     });
   },

@@ -1,8 +1,11 @@
 import { getConnection } from '../../util/db';
 
 export default async (raidId: number): Promise<{ data: string }> => {
-  const res = await getConnection().from('raid').where('id', raidId).del();
-  console.log(res);
+  const raid = await getConnection().from('raid').where('id', raidId).first();
+  if (!raid) {
+    throw new Error(`Raid ${raidId} not found`);
+  }
 
+  await getConnection().from('raid').where('id', raidId).del();
   return { data: `Raid ${raidId} deleted` };
 };

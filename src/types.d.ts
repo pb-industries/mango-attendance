@@ -65,3 +65,7 @@ interface Player extends Entity {
 type Direction = 'asc' | 'desc';
 
 type LogLevel = 'info' | 'debug' | 'error' | 'warning' | 'silent';
+
+interface AttendeeMetadata {
+  [key: string]: { id: number; nextTickElapsed: boolean };
+}
