@@ -1,11 +1,9 @@
 import { getConnection } from '../../util/db';
 
 export default async (
-  cursor: number,
-  direction: 'asc' | 'desc',
-  pageSize: number,
-  id?: number
-): Promise<Page> => {
+  id?: number,
+  mainsOnly?: boolean
+): Promise<{ data: {}; totalRows: number; id?: number }> => {
   let players = [];
   if (id) {
     players = await getConnection()
@@ -14,19 +12,21 @@ export default async (
       .where('id', id)
       .first();
   } else {
-    players = await getConnection()
-      .select('*')
-      .from('player')
-      .where(`id`, `${direction === 'asc' ? '>' : '<'}`, `${cursor}`)
-      .limit(pageSize);
+    if (!mainsOnly) {
+      players = await getConnection().select('*').from('player');
+    } else {
+      players = await getConnection()
+        .select('player.*')
+        .from('player')
+        .leftJoin('player_alt', 'player_alt.alt_id', 'player.id')
+        .groupBy('player.id')
+        .havingRaw('count(player_alt.player_id) = 0');
+    }
   }
 
   return {
     data: players,
     totalRows: players.length,
-    cursor,
-    direction,
-    pageSize,
     id,
   };
 };

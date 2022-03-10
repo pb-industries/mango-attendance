@@ -107,13 +107,8 @@ app.post('/raffle/{raffleId}', (req, res) => {
 
 // ROSTER endpoints
 app.get('/roster', async (req, res) => {
-  const { cursor, direction, pageSize, id } = req.query as any as Page;
-  const roster = await fetchRoster(
-    cursor ?? 0,
-    direction ?? 'asc',
-    pageSize ?? 20,
-    id
-  );
+  const { id, mains_only } = req.query as any;
+  const roster = await fetchRoster(id, mains_only);
   res.send(roster);
 });
 

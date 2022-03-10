@@ -87,7 +87,7 @@ const allTime = async (
   return await conn
     .select(
       conn.raw(
-        'p.name AS player_name, pr.player_id, round((cast(count(distinct pr.raid_id) as decimal) / cast(count(distinct all_raids.raid_id) as decimal) * 100), 2) AS attendance'
+        'p.name AS player_name, pr.player_id, round((cast(count(distinct pr.raid_id + pr.raid_hour) as decimal) / cast(count(distinct all_raids.raid_id + all_raids.raid_hour) as decimal) * 100), 2) AS attendance'
       )
     )
     .from(conn.raw('player_raid AS pr'))
@@ -105,7 +105,7 @@ const daysInRange = async (
   return await conn
     .select(
       conn.raw(
-        'p.name AS player_name, pr.player_id, round((cast(count(distinct pr.raid_id) as decimal) / cast(count(distinct all_raids.raid_id) as decimal) * 100), 2) AS attendance'
+        'p.name AS player_name, pr.player_id, round((cast(count(distinct pr.raid_id + pr.raid_hour) as decimal) / cast(count(distinct all_raids.raid_id + all_raids.raid_hour) as decimal) * 100), 2) AS attendance'
       )
     )
     .from(conn.raw('player_raid AS pr'))
