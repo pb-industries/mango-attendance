@@ -4,7 +4,7 @@ export default async (
   raidName: string,
   split?: number
 ): Promise<{ id: number; name: string; date: string; split: number }> => {
-  const date = new Date().toLocaleDateString();
+  const date = getFormattedDate(new Date());
   if (!split) {
     split = 1;
   }
@@ -49,10 +49,10 @@ const getFormattedDate = (date: Date) => {
   var year = date.getFullYear();
 
   var month = (1 + date.getMonth()).toString();
-  month = month.length > 1 ? month : "0" + month;
+  month = month.length > 1 ? month : '0' + month;
 
   var day = date.getDate().toString();
-  day = day.length > 1 ? day : "0" + day;
+  day = day.length > 1 ? day : '0' + day;
 
-  return month + "/" + day + "/" + year;
+  return month + '/' + day + '/' + year;
 };

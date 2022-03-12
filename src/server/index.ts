@@ -149,7 +149,7 @@ app.post('/roster/alt', async (req, res) => {
 app.get('/health', async (_, res) => {
   res.send({
     port: __port__,
-    res: 'Healthy',
+    message: 'OK',
   });
 });
 
