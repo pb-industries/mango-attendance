@@ -1,41 +1,16 @@
-import chalk from "chalk";
 // @ts-ignore
-import Tail from "tail-file";
-import { debounce } from "lodash";
-import { getConnection } from "../util/db";
-import addRaid from "./raids/add";
+import Tail from 'tail-file';
+import addRaid from './raids/add';
+import { log } from '../logger';
 
-let raid_id: number | null = null;
 let recording = false;
-let attendees: string[] = [];
-let attendeeMetadata: {
-  [key: string]: { id: number; recordedAttendance: boolean };
-} = {};
-const fetchPlayers = async () => {
-  const players = await getConnection()
-    .select(["id", "name"])
-    .from("player")
-    .whereIn("name", attendees);
-
-  players.forEach((player) => {
-    if (!attendeeMetadata[player.name.toLowerCase()]) {
-      attendeeMetadata[player.name.toLowerCase()] = {
-        id: player.id,
-        recordedAttendance: false,
-      };
-    }
-  });
-
-  await recordAttendance();
-};
-const fetchPlayersDebounced = debounce(fetchPlayers, 2000);
+const attendees: string[] = [];
 
 export default async (raidName: string) => {
-  let lastTimestamp: number = new Date().getTime();
-  const { id, name } = await addRaid(raidName);
-  raid_id = id;
+  let lastTimestamp = 0;
+  const { name } = await addRaid(raidName);
 
-  console.log(chalk.green.bold(`Recording raid ${name}`));
+  log.info(`Recording raid ${name}`);
 
   new Tail(process.env.LOG_FILE_PATH, (line: string) => {
     const { timestamp, shouldParse } = parseTimestamp(line, lastTimestamp);
@@ -52,7 +27,7 @@ export default async (raidName: string) => {
       const { player } = extractAttendanceInfo(line);
       if (player && !attendees.includes(player)) {
         attendees.push(player.toLowerCase());
-        fetchPlayersDebounced();
+        // TODO: HTTP TO SERVER TO RECORD TICK
       }
     }
 
@@ -71,7 +46,7 @@ export default async (raidName: string) => {
  */
 const setRecordState = (line: string): boolean => {
   if (line.match(/(Players in EverQuest:)/gi)?.length === 1) {
-    console.log(chalk.yellow.bold("Recording started..."));
+    log.info('Recording started...');
     recording = true;
     return false;
   }
@@ -80,7 +55,7 @@ const setRecordState = (line: string): boolean => {
     line.match(/(There are ([0-9]+) players in EverQuest.)/gi)?.length === 1 ||
     line.match(/There is 1 player in EverQuest./gi)?.length === 1
   ) {
-    console.log(chalk.red.bold("Recording ended..."));
+    log.info('Recording ended...');
     recording = false;
     return false;
   }
@@ -101,6 +76,7 @@ const extractAttendanceInfo = (line: string) => {
 
   return {
     player: matches?.[1] || null,
+    zone: matches?.[2]?.replace('(', '').replace(')', '') || null,
   };
 };
 
@@ -108,33 +84,10 @@ const parseTimestamp = (line: string, lastParsedTimestamp: number) => {
   const dateTime = Date.parse(
     line
       .match(/\[[A-Za-z0-9: ]+\]/g)?.[0]
-      ?.replace("[", "")
-      .replace("]", "") || new Date().toLocaleString()
+      ?.replace('[', '')
+      .replace(']', '') || new Date().toLocaleString()
   );
 
   // Don't re-parse lines we've already parsed
   return { timestamp: dateTime, shouldParse: dateTime >= lastParsedTimestamp };
-};
-
-/**
- * Given a list of players, record their attendance each time the player
- * list updates.
- */
-const recordAttendance = async () => {
-  const playersToRecord = Object.values(attendeeMetadata)
-    .filter(({ recordedAttendance }) => recordedAttendance === false)
-    .map(({ id }) => {
-      return { raid_id, player_id: id };
-    });
-
-  console.log(playersToRecord);
-  if (playersToRecord.length) {
-    await getConnection()
-      .insert(playersToRecord)
-      .into("player_raid")
-      .onConflict(["player_id", "raid_id"])
-      .merge({ updated_at: new Date() });
-
-    console.log(chalk.blue("Successfully recorded attendance"));
-  }
 };

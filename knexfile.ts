@@ -1,25 +1,21 @@
-require("dotenv").config();
-
-console.log(
-  process.env.DB_HOST,
-  process.env.DB_USER,
-  process.env.DB_PASS,
-  process.env.DB_NAME
-);
+require('dotenv').config();
 
 module.exports = {
   development: {
-    client: "pg",
+    client: 'pg',
+    version: '21.2.4',
     connection: {
-      host: process.env.DB_HOST || "localhost",
-      user: process.env.DB_USER || "postgres",
-      password: process.env.DB_PASS || "postgrespassword",
-      driver: process.env.DB_DRIVER || "postgresql",
+      host: process.env.DB_HOST || 'localhost',
+      user: process.env.DB_USER || 'postgres',
+      password: process.env.DB_PASS || 'postgrespassword',
       port: process.env.DB_PORT || 5432,
-      database: process.env.DB_NAME || "postgres",
+      database: [process.env.DB_CLUSTER, process.env.DB_NAME || 'postgres']
+        .filter((v) => v)
+        .join('.'),
+      ssl: { rejectUnauthorized: true },
     },
   },
   migrations: {
-    directory: "./migrations",
+    directory: './migrations',
   },
 };
