@@ -67,6 +67,13 @@ export default async () => {
         .transacting(trx);
     });
 
+    // In order to emulate replacing the whole sheet, insert a bunch of blank
+    // cells incase members are ever removed
+    const blankRows = 10;
+    for (let j = blankRows; j > 0; j--) {
+      sheetRows.push(["", 0, 0, 0, 0]);
+    }
+
     try {
       await Promise.all(updates);
       await trx.commit();
@@ -76,7 +83,7 @@ export default async () => {
       log.error(e);
       log.error('unexpected error when saving attendance');
       await trx.rollback();
-      throw e;
+      process.exit(1);
     }
   });
 };
@@ -84,6 +91,7 @@ export default async () => {
 const allTime = async (
   conn: Knex<any, unknown[]>
 ): Promise<AttendanceDatum[]> => {
+  console.log(chalk.yellow("Fetching attendance % for all time"));
   return await conn
     .select(
       conn.raw(
@@ -102,6 +110,7 @@ const daysInRange = async (
   conn: Knex<any, unknown[]>,
   days: number
 ): Promise<AttendanceDatum[]> => {
+  console.log(chalk.yellow(`Fetching attendance % for the past ${days} days`));
   return await conn
     .select(
       conn.raw(

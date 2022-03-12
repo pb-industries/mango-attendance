@@ -37,3 +37,22 @@ export default async (
 
   return { id: raid?.id, name: `${raidName}@${date}`, date, split };
 };
+
+/**
+ * Postgres requires a date in mm/dd/yyyy format, the default
+ * of date.toLocaleDateString is dd/mm/yyyy
+ *
+ * @param date
+ * @returns
+ */
+const getFormattedDate = (date: Date) => {
+  var year = date.getFullYear();
+
+  var month = (1 + date.getMonth()).toString();
+  month = month.length > 1 ? month : "0" + month;
+
+  var day = date.getDate().toString();
+  day = day.length > 1 ? day : "0" + day;
+
+  return month + "/" + day + "/" + year;
+};
