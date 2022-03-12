@@ -2,11 +2,15 @@
   "name": "bnc-attendance",
   "version": "1.0.0",
   "scripts": {
-    "lint": "eslint . --ext .ts",
-    "build": "rm -rf dist && tsc",
+    "postinstall": "[ \"$NODE_ENV\" = production ] || yarn husky install",
+    "clean": "rm -rf dist",
+    "build": "yarn clean && tsc -p tsconfig.prod.json",
+    "test": "yarn clean && jest",
+    "start": "node dist/server/index.js",
     "rebuild": "yarn build && yarn start",
-    "start": "node ./dist/server/index.js",
-    "dev": "yarn tsc-watch --onSuccess \"yarn rebuild\" | pino-pretty"
+    "test-watch": "yarn test --watchAll",
+    "dev": "tsc-watch --onSuccess \"yarn rebuild\" | pino-pretty",
+    "lint": "eslint . --ext .ts"
   },
   "license": "MIT",
   "dependencies": {
@@ -17,6 +21,7 @@
     "express": "^4.17.1",
     "express-pino-logger": "^7.0.0",
     "googleapis": "^88.2.0",
+    "husky": "^7.0.4",
     "knex": "^0.95.11",
     "pg": "^8.7.3",
     "pino": "^7.8.0",
