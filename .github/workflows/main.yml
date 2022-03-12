@@ -1,5 +1,8 @@
 name: Fly CI/CD
 
+env:
+  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
 on:
   push:
     branches: [master]
