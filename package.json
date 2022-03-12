@@ -4,7 +4,7 @@
   "scripts": {
     "postinstall": "[ \"$NODE_ENV\" = production ] || yarn husky install",
     "clean": "rm -rf dist",
-    "build": "yarn clean && tsc -p tsconfig.prod.json",
+    "build": "yarn clean && tsc",
     "test": "yarn clean && jest",
     "start": "node dist/server/index.js",
     "rebuild": "yarn build && yarn start",
