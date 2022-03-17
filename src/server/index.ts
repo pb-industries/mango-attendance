@@ -132,21 +132,20 @@ app.post('/roster', async (req, res) => {
 });
 
 app.post('/roster/alt', async (req, res) => {
-  let { main_id, alt_ids } = req.body;
-  if (!alt_ids) {
+  let { main_id, alt_params } = req.body;
+  if (!alt_params) {
     res.status(400).send('Missing alt ids');
   } else if (!main_id) {
     res.status(400).send('Missing main id');
   } else {
-    if (typeof alt_ids === 'string') {
-      alt_ids = alt_ids.split(',').map((id) => id);
+    if (typeof alt_params === 'string') {
+      alt_params = alt_params.split(',').map((id) => {
+        name: id;
+      });
     }
 
     res.send({
-      data: await addAlt(
-        `${main_id}`,
-        alt_ids.map((id: any) => `${id}`)
-      ),
+      data: await addAlt(`${main_id}`, alt_params),
     });
   }
 });

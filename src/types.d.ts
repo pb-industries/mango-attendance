@@ -18,6 +18,11 @@ interface Raid extends Entity {
   split: number;
 }
 
+interface PlayerAlt {
+  player_id: number;
+  alt_id: number;
+}
+
 interface Player extends Entity {
   name?: string;
   level?: number;
@@ -68,4 +73,13 @@ type LogLevel = 'info' | 'debug' | 'error' | 'warning' | 'silent';
 
 interface AttendeeMetadata {
   [key: string]: { id: number; nextTickElapsed: boolean };
+}
+
+interface CacheConfig {
+  host: string;
+  password: string;
+  user: string;
+  port: number;
+  debug: boolean;
+  driver: string;
 }

@@ -1,13 +1,17 @@
 import { log } from '@/logger';
 import { getConnection } from '@/util/db';
+import addPlayer from '@/commands/roster/add';
 
 export default async (
   player_id: string,
-  alt_ids: string[]
-): Promise<Player[]> => {
+  alts: Player[]
+): Promise<PlayerAlt[]> => {
+  let assignedAlts: PlayerAlt[] = [];
   const knex = await getConnection();
 
-  log.info({ main_id: player_id, box_ids: alt_ids });
+  const altIds = await fetchAltIds(alts);
+
+  log.info({ main_id: player_id, box_ids: altIds });
   try {
     await knex.transaction(async (trx) => {
       const playersToAdd = (
@@ -16,7 +20,7 @@ export default async (
           .from('player')
           .whereIn(
             'id',
-            [player_id, ...alt_ids].map((id: any) => `${id}`)
+            [player_id, ...altIds].map((id: any) => `${id}`)
           )
       ).map((player) => `${player.id}`);
 
@@ -28,12 +32,12 @@ export default async (
 
       const res = await trx()
         .from('player_alt')
-        .whereIn('player_id', alt_ids)
-        .orWhereIn('alt_id', alt_ids)
+        .whereIn('player_id', altIds)
+        .orWhereIn('alt_id', altIds)
         .delete();
       log.debug({ res }, 'deleted player_alt');
 
-      const rows = await trx()
+      assignedAlts = await trx()
         .insert(
           playersToAdd
             .filter((alt_id) => alt_id !== player_id)
@@ -43,11 +47,14 @@ export default async (
         )
         .into('player_alt')
         .returning('*');
-      log.debug({ playersToAdd, rows });
-      return rows;
+      log.debug({ playersToAdd, assignedAlts });
     });
   } catch (e) {
     log.error(e);
   }
-  return [];
+  return assignedAlts;
+};
+
+const fetchAltIds = async (players: Player[]) => {
+  return await (await addPlayer(players)).map((player) => player.id);
 };
