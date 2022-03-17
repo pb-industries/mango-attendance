@@ -8,8 +8,8 @@ export const getConnection = async () => {
     connection = knex({
       client: 'pg',
       version: '21.2.4',
-      connection: __db__,
-      debug: __db__.debug,
+      connection: __db__ as any,
+      debug: __db__.debug as any,
       migrations: {
         directory: '@/migrations',
       },
