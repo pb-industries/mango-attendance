@@ -1,7 +1,8 @@
-import { log } from '../../logger';
-import { getConnection } from '../../util/db';
+import { log } from '@/logger';
+import { getConnection } from '@/util/db';
 
 export default async (players: Player[]): Promise<Player[]> => {
+  const knex = await getConnection();
   const playersToAdd = players.map((player) => {
     if (!player.name) {
       throw new Error('Missing player name');
@@ -12,7 +13,7 @@ export default async (players: Player[]): Promise<Player[]> => {
     };
   });
 
-  const rows = await getConnection()
+  const rows = await knex
     .insert(playersToAdd)
     .into('player')
     .onConflict(['name'])

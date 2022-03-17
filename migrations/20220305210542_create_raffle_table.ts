@@ -11,8 +11,8 @@ module.exports = {
       table.timestamp('created_at').defaultTo(knex.fn.now());
       table.timestamp('updated_at').defaultTo(knex.fn.now());
 
-      table.foreign('raid_id').references('raid.id');
-      table.foreign('winner_id').references('player.id');
+      table.foreign('raid_id').references('raid.id').onDelete('CASCADE');
+      table.foreign('winner_id').references('player.id').onDelete('CASCADE');
     });
   },
   down: async function (knex) {

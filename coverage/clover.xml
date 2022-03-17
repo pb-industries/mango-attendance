@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1647284632024" clover="3.2.0">
+  <project timestamp="1647284632024" name="All files">
+    <metrics statements="97" coveredstatements="87" conditionals="28" coveredconditionals="22" methods="24" coveredmethods="17" elements="149" coveredelements="126" complexity="0" loc="97" ncloc="97" packages="4" files="11" classes="11"/>
+    <package name="migrations">
+      <metrics statements="58" coveredstatements="51" conditionals="0" coveredconditionals="0" methods="19" coveredmethods="12"/>
+      <file name="20211007075416_create_player_table.ts" path="/home/alexmk92/code/bnc-attendance/migrations/20211007075416_create_player_table.ts">
+        <metrics statements="15" coveredstatements="14" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="2"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="4" count="2" type="stmt"/>
+        <line num="5" count="2" type="stmt"/>
+        <line num="6" count="2" type="stmt"/>
+        <line num="7" count="2" type="stmt"/>
+        <line num="8" count="2" type="stmt"/>
+        <line num="9" count="2" type="stmt"/>
+        <line num="10" count="2" type="stmt"/>
+        <line num="11" count="2" type="stmt"/>
+        <line num="12" count="2" type="stmt"/>
+        <line num="13" count="2" type="stmt"/>
+        <line num="14" count="2" type="stmt"/>
+        <line num="16" count="2" type="stmt"/>
+        <line num="20" count="0" type="stmt"/>
+      </file>
+      <file name="20211007075427_create_raid_table.ts" path="/home/alexmk92/code/bnc-attendance/migrations/20211007075427_create_raid_table.ts">
+        <metrics statements="7" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="2"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="4" count="2" type="stmt"/>
+        <line num="5" count="2" type="stmt"/>
+        <line num="6" count="2" type="stmt"/>
+        <line num="7" count="2" type="stmt"/>
+        <line num="11" count="0" type="stmt"/>
+      </file>
+      <file name="20211007075447_create_player_raid_table.ts" path="/home/alexmk92/code/bnc-attendance/migrations/20211007075447_create_player_raid_table.ts">
+        <metrics statements="9" coveredstatements="8" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="2"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="4" count="2" type="stmt"/>
+        <line num="9" count="2" type="stmt"/>
+        <line num="10" count="2" type="stmt"/>
+        <line num="11" count="2" type="stmt"/>
+        <line num="12" count="2" type="stmt"/>
+        <line num="14" count="2" type="stmt"/>
+        <line num="18" count="0" type="stmt"/>
+      </file>
+      <file name="20220228205852_create_player_alt_table.ts" path="/home/alexmk92/code/bnc-attendance/migrations/20220228205852_create_player_alt_table.ts">
+        <metrics statements="8" coveredstatements="7" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="2"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="4" count="2" type="stmt"/>
+        <line num="5" count="2" type="stmt"/>
+        <line num="6" count="2" type="stmt"/>
+        <line num="7" count="2" type="stmt"/>
+        <line num="8" count="2" type="stmt"/>
+        <line num="12" count="0" type="stmt"/>
+      </file>
+      <file name="20220301135452_add_split_to_raid_table.ts" path="/home/alexmk92/code/bnc-attendance/migrations/20220301135452_add_split_to_raid_table.ts">
+        <metrics statements="6" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="4" coveredmethods="2"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="4" count="2" type="stmt"/>
+        <line num="5" count="2" type="stmt"/>
+        <line num="9" count="0" type="stmt"/>
+        <line num="10" count="0" type="stmt"/>
+      </file>
+      <file name="20220305210542_create_raffle_table.ts" path="/home/alexmk92/code/bnc-attendance/migrations/20220305210542_create_raffle_table.ts">
+        <metrics statements="13" coveredstatements="12" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="2"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="3" count="2" type="stmt"/>
+        <line num="4" count="2" type="stmt"/>
+        <line num="5" count="2" type="stmt"/>
+        <line num="6" count="2" type="stmt"/>
+        <line num="7" count="2" type="stmt"/>
+        <line num="8" count="2" type="stmt"/>
+        <line num="9" count="2" type="stmt"/>
+        <line num="11" count="2" type="stmt"/>
+        <line num="12" count="2" type="stmt"/>
+        <line num="14" count="2" type="stmt"/>
+        <line num="15" count="2" type="stmt"/>
+        <line num="19" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="src">
+      <metrics statements="3" coveredstatements="3" conditionals="12" coveredconditionals="12" methods="0" coveredmethods="0"/>
+      <file name="constants.ts" path="/home/alexmk92/code/bnc-attendance/src/constants.ts">
+        <metrics statements="3" coveredstatements="3" conditionals="12" coveredconditionals="12" methods="0" coveredmethods="0"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="2" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="3" count="2" type="stmt"/>
+      </file>
+    </package>
+    <package name="src.commands.raids">
+      <metrics statements="23" coveredstatements="21" conditionals="12" coveredconditionals="7" methods="3" coveredmethods="3"/>
+      <file name="add.ts" path="/home/alexmk92/code/bnc-attendance/src/commands/raids/add.ts">
+        <metrics statements="17" coveredstatements="16" conditionals="8" coveredconditionals="5" methods="2" coveredmethods="2"/>
+        <line num="7" count="5" type="stmt"/>
+        <line num="8" count="5" type="cond" truecount="1" falsecount="1"/>
+        <line num="9" count="0" type="stmt"/>
+        <line num="12" count="5" type="stmt"/>
+        <line num="14" count="5" type="stmt"/>
+        <line num="20" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="21" count="3" type="stmt"/>
+        <line num="25" count="2" type="stmt"/>
+        <line num="35" count="2" type="stmt"/>
+        <line num="38" count="5" type="stmt"/>
+        <line num="48" count="1" type="stmt"/>
+        <line num="49" count="5" type="stmt"/>
+        <line num="51" count="5" type="stmt"/>
+        <line num="52" count="5" type="cond" truecount="1" falsecount="1"/>
+        <line num="54" count="5" type="stmt"/>
+        <line num="55" count="5" type="cond" truecount="1" falsecount="1"/>
+        <line num="57" count="5" type="stmt"/>
+      </file>
+      <file name="fetch.ts" path="/home/alexmk92/code/bnc-attendance/src/commands/raids/fetch.ts">
+        <metrics statements="6" coveredstatements="5" conditionals="4" coveredconditionals="2" methods="1" coveredmethods="1"/>
+        <line num="9" count="1" type="stmt"/>
+        <line num="10" count="1" type="stmt"/>
+        <line num="11" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="12" count="0" type="stmt"/>
+        <line num="14" count="1" type="stmt"/>
+        <line num="21" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="src.util">
+      <metrics statements="13" coveredstatements="12" conditionals="4" coveredconditionals="3" methods="2" coveredmethods="2"/>
+      <file name="db.ts" path="/home/alexmk92/code/bnc-attendance/src/util/db.ts">
+        <metrics statements="8" coveredstatements="7" conditionals="4" coveredconditionals="3" methods="1" coveredmethods="1"/>
+        <line num="5" count="2" type="stmt"/>
+        <line num="7" count="2" type="stmt"/>
+        <line num="8" count="6" type="cond" truecount="2" falsecount="0"/>
+        <line num="9" count="2" type="stmt"/>
+        <line num="10" count="2" type="cond" truecount="1" falsecount="1"/>
+        <line num="11" count="2" type="stmt"/>
+        <line num="13" count="0" type="stmt"/>
+        <line num="25" count="6" type="stmt"/>
+      </file>
+      <file name="getTestDb.ts" path="/home/alexmk92/code/bnc-attendance/src/util/getTestDb.ts">
+        <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="4" count="2" type="stmt"/>
+        <line num="5" count="2" type="stmt"/>
+        <line num="6" count="2" type="stmt"/>
+        <line num="9" count="2" type="stmt"/>
+        <line num="10" count="2" type="stmt"/>
+      </file>
+    </package>
+  </project>
+</coverage>

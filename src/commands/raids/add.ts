@@ -1,9 +1,6 @@
-import { getConnection } from '../../util/db';
+import { getConnection } from '@/util/db';
 
-export default async (
-  raidName: string,
-  split?: number
-): Promise<{ id: number; name: string; date: string; split: number }> => {
+export default async (raidName: string, split?: number): Promise<Raid> => {
   const date = getFormattedDate(new Date());
   if (!split) {
     split = 1;
@@ -17,10 +14,11 @@ export default async (
     .where('created_at', date)
     .andWhere('split', split)
     .first();
+
   if (raid) {
-    await knex('raid')
-      .where('id', raid.id)
-      .update({ updated_at: new Date(), name: raidName });
+    const params = { updated_at: new Date(), name: raidName.toLowerCase() };
+    await knex('raid').where('id', raid.id).update(params);
+    raid = { ...raid, ...params };
   } else {
     const raids = await knex
       .insert({
@@ -35,7 +33,7 @@ export default async (
     raid = raids[0];
   }
 
-  return { id: raid?.id, name: `${raidName}@${date}`, date, split };
+  return raid;
 };
 
 /**

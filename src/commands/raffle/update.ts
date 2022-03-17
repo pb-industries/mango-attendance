@@ -1,5 +1,5 @@
-import { log } from '../../logger';
-import { getConnection } from '../../util/db';
+import { log } from '@/logger';
+import { getConnection } from '@/util/db';
 
 export default async (
   raffleId: number,

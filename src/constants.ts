@@ -6,6 +6,6 @@ export const __db__ = {
   password: process.env.DB_PASS || '',
   port: process.env.DB_PORT || 3306,
   database: `${process.env.DB_CLUSTER}.${process.env.DB_NAME || 'default'}`,
-  debug: !__prod__,
+  debug: process.env.DB_DEBUG || false,
   ssl: { rejectUnauthorized: true },
 };

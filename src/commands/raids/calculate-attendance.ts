@@ -1,7 +1,7 @@
 import { Knex } from 'knex';
-import { log } from '../../logger';
-import { getConnection } from '../../util/db';
-// import { getSheets } from "../../util/googleApi";
+import { log } from '@/logger';
+import { getConnection } from '@/util/db';
+// import { getSheets } from "@/util/googleApi";
 
 type Attendance =
   | 'attendance_life'
@@ -16,15 +16,15 @@ interface AttendanceDatum {
 }
 
 export default async () => {
-  const conn = await getConnection();
+  const knex = await getConnection();
   const playerAttendance: {
     [key: number]: { [key: string]: number | string };
   } = {};
   const attendanceData: { name: Attendance; data: AttendanceDatum[] }[] = [
-    { name: 'attendance_life', data: await allTime(conn) },
-    { name: 'attendance_30', data: await daysInRange(conn, 30) },
-    { name: 'attendance_60', data: await daysInRange(conn, 60) },
-    { name: 'attendance_90', data: await daysInRange(conn, 90) },
+    { name: 'attendance_life', data: await allTime(knex) },
+    { name: 'attendance_30', data: await daysInRange(knex, 30) },
+    { name: 'attendance_60', data: await daysInRange(knex, 60) },
+    { name: 'attendance_90', data: await daysInRange(knex, 90) },
   ];
 
   attendanceData.forEach(({ name, data }) => {
@@ -46,7 +46,7 @@ export default async () => {
     });
   });
 
-  conn.transaction(async (trx) => {
+  knex.transaction(async (trx) => {
     const sheetRows: (string | number)[][] = [];
     const updates = Object.values(playerAttendance).map((attendance) => {
       const { player_id, player_name } = attendance;
@@ -89,45 +89,45 @@ export default async () => {
 };
 
 const allTime = async (
-  conn: Knex<any, unknown[]>
+  knex: Knex<any, unknown[]>
 ): Promise<AttendanceDatum[]> => {
   console.info('Fetching attendance % for all time');
-  return await conn
+  return await knex
     .select(
-      conn.raw(
+      knex.raw(
         'p.name AS player_name, pr.player_id, round((cast(count(distinct pr.raid_id + pr.raid_hour) as decimal) / cast(count(distinct all_raids.raid_id + all_raids.raid_hour) as decimal) * 100), 2) AS attendance'
       )
     )
-    .from(conn.raw('player_raid AS pr'))
+    .from(knex.raw('player_raid AS pr'))
     .innerJoin(
-      conn.raw('player_raid AS all_raids ON all_raids.raid_id IS NOT NULL')
+      knex.raw('player_raid AS all_raids ON all_raids.raid_id IS NOT NULL')
     )
-    .leftJoin(conn.raw('player AS p ON pr.player_id = p.id'))
-    .groupBy(conn.raw('pr.player_id, p.name'));
+    .leftJoin(knex.raw('player AS p ON pr.player_id = p.id'))
+    .groupBy(knex.raw('pr.player_id, p.name'));
 };
 
 const daysInRange = async (
-  conn: Knex<any, unknown[]>,
+  knex: Knex<any, unknown[]>,
   days: number
 ): Promise<AttendanceDatum[]> => {
   console.info(`Fetching attendance % for the past ${days} days`);
-  return await conn
+  return await knex
     .select(
-      conn.raw(
+      knex.raw(
         'p.name AS player_name, pr.player_id, round((cast(count(distinct pr.raid_id + pr.raid_hour) as decimal) / cast(count(distinct all_raids.raid_id + all_raids.raid_hour) as decimal) * 100), 2) AS attendance'
       )
     )
-    .from(conn.raw('player_raid AS pr'))
+    .from(knex.raw('player_raid AS pr'))
     .innerJoin(
-      conn.raw(
+      knex.raw(
         `player_raid AS all_raids ON all_raids.raid_id IS NOT NULL AND all_raids.created_at > current_timestamp - interval '${days}' day`
       )
     )
-    .leftJoin(conn.raw('player AS p ON pr.player_id = p.id'))
+    .leftJoin(knex.raw('player AS p ON pr.player_id = p.id'))
     .where(
-      conn.raw(`pr.created_at > current_timestamp - interval '${days}' day`)
+      knex.raw(`pr.created_at > current_timestamp - interval '${days}' day`)
     )
-    .groupBy(conn.raw('pr.player_id, p.name'));
+    .groupBy(knex.raw('pr.player_id, p.name'));
 };
 
 // const updateSheet = async (playerAttendance: (string | number)[][]) => {

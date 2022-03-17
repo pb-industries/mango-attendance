@@ -4,11 +4,11 @@
   "scripts": {
     "postinstall": "[ \"$NODE_ENV\" = production ] || yarn husky install",
     "clean": "rm -rf dist",
-    "build": "yarn clean && tsc",
+    "build": "yarn clean && tsc -p tsconfig.prod.json",
     "test": "yarn clean && jest",
     "start": "node dist/server/index.js",
     "rebuild": "yarn build && yarn start",
-    "test-watch": "yarn test --watchAll",
+    "test-watch": "yarn test --watchAll --collectCoverage=false --verbose=false",
     "dev": "tsc-watch --onSuccess \"yarn rebuild\" | pino-pretty",
     "lint": "eslint . --ext .ts"
   },
@@ -21,26 +21,42 @@
     "express": "^4.17.1",
     "express-pino-logger": "^7.0.0",
     "googleapis": "^88.2.0",
-    "husky": "^7.0.4",
+    "ioredis": "^4.28.5",
     "knex": "^0.95.11",
+    "module-alias": "^2.2.2",
     "pg": "^8.7.3",
+    "pg-mem": "^2.3.3",
     "pino": "^7.8.0",
+    "source-map-support": "^0.5.21",
     "tail-file": "^1.4.14"
   },
   "devDependencies": {
+    "@babel/core": "^7.17.7",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-typescript": "^7.16.7",
     "@types/express": "^4.17.13",
     "@types/express-pino-logger": "^4.0.3",
+    "@types/ioredis": "^4.28.8",
+    "@types/ioredis-mock": "^5.6.0",
+    "@types/jest": "^27.4.1",
     "@types/knex": "^0.16.1",
     "@types/lodash": "^4.14.175",
+    "@types/node": "^17.0.21",
     "@typescript-eslint/eslint-plugin": "^5.13.0",
     "@typescript-eslint/parser": "^5.13.0",
     "eslint": "^8.10.0",
     "eslint-config-prettier": "^8.4.0",
     "eslint-plugin-no-loops": "^0.3.0",
     "eslint-plugin-prettier": "^4.0.0",
+    "husky": "^7.0.4",
+    "ioredis-mock": "^7.1.0",
+    "jest": "^27.5.1",
     "pino-pretty": "^7.5.1",
     "prettier": "^2.5.1",
     "tsc-watch": "^4.6.0",
     "typescript": "^4.5.5"
+  },
+  "_moduleAliases": {
+    "@": "dist"
   }
 }

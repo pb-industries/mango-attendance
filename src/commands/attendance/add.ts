@@ -1,5 +1,5 @@
-import { log } from '../../logger';
-import { getConnection } from '../../util/db';
+import { log } from '@/logger';
+import { getConnection } from '@/util/db';
 
 export default async (
   raidId: number,
@@ -22,7 +22,7 @@ export default async (
   });
 
   if (playersToRecord.length) {
-    const rows = await getConnection()
+    const rows = await knex
       .insert(playersToRecord)
       .into('player_raid')
       .onConflict(['player_id', 'raid_id', 'raid_hour'])

@@ -1,4 +1,4 @@
-import { getConnection } from '../../util/db';
+import { getConnection } from '@/util/db';
 
 export default async (
   cursor: number,
@@ -6,15 +6,12 @@ export default async (
   pageSize: number,
   id?: number
 ): Promise<Page> => {
+  const knex = await getConnection();
   let raids = [];
   if (id) {
-    raids = await getConnection()
-      .select('*')
-      .from('raid')
-      .where('id', id)
-      .first();
+    raids = await knex.select('*').from('raid').where('id', id).first();
   } else {
-    raids = await getConnection()
+    raids = await knex
       .select('*')
       .from('raid')
       .where(`id`, `${direction === 'asc' ? '>' : '<'}`, `${cursor}`)

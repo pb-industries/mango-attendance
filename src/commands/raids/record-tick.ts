@@ -1,47 +1,61 @@
-import { getConnection } from '../../util/db';
-import { log } from '../../logger';
+import { getConnection } from '@/util/db';
+import { log } from '@/logger';
 
 /**
  * Given a list of players, record their attendance each time the player
  * list updates.
  */
-export default async (raidId: string, playerNames: string[]) => {
-  const raid = await getConnection().from('raid').where('id', raidId).first();
+export default async (
+  raidId: string,
+  playerNames: string[],
+  finalTick?: boolean
+) => {
+  const knex = await getConnection();
+  const raid = await knex.from('raid').where('id', raidId).first();
   if (!raid) {
     throw new Error(`Raid ${raidId} not found`);
   }
 
   const elapsedTicks = await getTotalTicks(raidId);
-  const currentTick = elapsedTicks == -1 ? 0 : elapsedTicks + 1;
-  const attendeeMetadata = await fetchPlayers(playerNames, currentTick, raidId);
+  const attendeeMetadata = await fetchPlayers(
+    playerNames,
+    elapsedTicks,
+    raidId,
+    3600
+  );
 
   const playersToRecord = Object.values(attendeeMetadata)
-    .filter(({ nextTickElapsed }) => nextTickElapsed === true)
+    .filter(
+      ({ nextTickElapsed }) => nextTickElapsed === true || finalTick === true
+    )
     .map(({ id }) => {
       return {
         raid_id: raidId,
         player_id: id,
         // Tick 0 is our ontime tick =)
-        raid_hour: currentTick,
+        raid_hour: elapsedTicks + 1,
       };
     });
 
   if (playersToRecord.length) {
-    const rows = await getConnection()
+    await knex
       .insert(playersToRecord)
       .into('player_raid')
       .onConflict(['player_id', 'raid_id', 'raid_hour'])
       .merge({ updated_at: new Date() });
 
-    log.debug(rows);
-    log.info('Recorded attendance for ' + rows.length + ' players');
+    log.info('Recorded attendance for ' + playersToRecord.length + ' players');
   }
 
-  return { playersRecorded: playersToRecord.length, tick: currentTick };
+  const recordedTicks = playersToRecord.length
+    ? elapsedTicks + 1
+    : elapsedTicks;
+  return { playersRecorded: playersToRecord.length, tick: recordedTicks };
 };
 
 const getTotalTicks = async (raidId: string): Promise<number> => {
-  const res = await getConnection()
+  const knex = await getConnection();
+  const res = await knex
     .countDistinct({ ticks: 'raid_hour' })
     .from('player_raid')
     .where('raid_id', raidId);
@@ -61,7 +75,8 @@ const getTotalTicks = async (raidId: string): Promise<number> => {
 const fetchPlayers = async (
   attendees: string[],
   currentTick: number,
-  raidId: string
+  raidId: string,
+  tickAllowanceThresholdSeconds: number = 3600
 ): Promise<AttendeeMetadata> => {
   const knex = await getConnection();
   const players = await knex
@@ -69,13 +84,23 @@ const fetchPlayers = async (
       'p.id',
       'p.name',
       knex.raw(
-        `(pr.raid_id IS NULL OR (${currentTick} = 0 OR EXTRACT(epoch from (now() - pr.created_at)) > 3600)) AS next_tick_elapsed`
+        `(pr.raid_id IS NULL OR (${currentTick} < 1 OR EXTRACT(epoch from (now() - COALESCE(last_tick.last_tick_time, pr.created_at))) > ${tickAllowanceThresholdSeconds})) AS next_tick_elapsed`
       ),
     ])
     .from('player AS p')
     .leftJoin(
       knex.raw(
         `player_raid AS pr ON pr.player_id = p.id AND pr.raid_id = ${raidId}`
+      )
+    )
+    .leftJoin(
+      knex.raw(
+        `(
+          SELECT player_id, raid_id, MAX(raid_hour) AS max_raid_hour, MAX(created_at) AS last_tick_time
+          FROM player_raid
+          WHERE raid_id = ${raidId}
+          GROUP BY player_id, raid_id
+        ) AS last_tick ON last_tick.player_id = p.id`
       )
     )
     .whereIn('p.name', attendees);

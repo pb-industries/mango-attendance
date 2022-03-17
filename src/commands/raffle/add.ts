@@ -1,4 +1,4 @@
-import { getConnection } from '../../util/db';
+import { getConnection } from '@/util/db';
 
 export default async (
   raidId: number,

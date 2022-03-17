@@ -8,7 +8,7 @@ interface Page {
 }
 
 interface Entity {
-  id?: number;
+  id?: any;
   created_at?: string;
   updated_at?: string;
 }

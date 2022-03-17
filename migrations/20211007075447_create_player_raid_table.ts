@@ -5,8 +5,14 @@ module.exports = {
         .integer('player_id')
         .notNullable()
         .references('id')
-        .inTable('player');
-      table.integer('raid_id').notNullable().references('id').inTable('raid');
+        .inTable('player')
+        .onDelete('CASCADE');
+      table
+        .integer('raid_id')
+        .notNullable()
+        .references('id')
+        .inTable('raid')
+        .onDelete('CASCADE');
       table.integer('raid_hour').notNullable();
       table.timestamp('created_at').defaultTo(knex.fn.now());
       table.timestamp('updated_at').defaultTo(knex.fn.now());

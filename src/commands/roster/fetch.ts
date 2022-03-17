@@ -1,21 +1,18 @@
-import { getConnection } from '../../util/db';
+import { getConnection } from '@/util/db';
 
 export default async (
   id?: number,
   mainsOnly?: boolean
-): Promise<{ data: {}; totalRows: number; id?: number }> => {
+): Promise<{ data: Player | Player[]; totalRows: number; id?: number }> => {
+  const knex = await getConnection();
   let players = [];
   if (id) {
-    players = await getConnection()
-      .select('*')
-      .from('player')
-      .where('id', id)
-      .first();
+    players = await knex.select('*').from('player').where('id', id).first();
   } else {
     if (!mainsOnly) {
-      players = await getConnection().select('*').from('player');
+      players = await knex.select('*').from('player');
     } else {
-      players = await getConnection()
+      players = await knex
         .select('player.*')
         .from('player')
         .leftJoin('player_alt', 'player_alt.alt_id', 'player.id')

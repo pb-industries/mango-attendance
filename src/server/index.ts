@@ -1,19 +1,24 @@
+// Do not modify this line, this imports dev tooling for compiling
+// from typescript to javascript.
+import 'module-alias/register';
+import 'source-map-support/register';
+
 import 'dotenv/config';
 
 import express from 'express';
 import expressPino from 'express-pino-logger';
-import fetchRaid from '../commands/raids/fetch';
-import addRaid from '../commands/raids/add';
-import deleteRaid from '../commands/raids/delete';
-import calculateAttendance from '../commands/raids/calculate-attendance';
-import recordTick from '../commands/raids/record-tick';
-import fetchRoster from '../commands/roster/fetch';
-import addAlt from '../commands/roster/add-alt';
-import addPlayer from '../commands/roster/add';
-import addRaffle from '../commands/raffle/add';
-import fetchRaffleRolls from '../commands/raffle/fetch-roll';
-import { __port__ } from '../constants';
-import { log } from '../logger';
+import fetchRaid from '@/commands/raids/fetch';
+import addRaid from '@/commands/raids/add';
+import deleteRaid from '@/commands/raids/delete';
+import calculateAttendance from '@/commands/raids/calculate-attendance';
+import recordTick from '@/commands/raids/record-tick';
+import fetchRoster from '@/commands/roster/fetch';
+import addAlt from '@/commands/roster/add-alt';
+import addPlayer from '@/commands/roster/add';
+import addRaffle from '@/commands/raffle/add';
+import fetchRaffleRolls from '@/commands/raffle/fetch-roll';
+import { __port__ } from '@/constants';
+import { log } from '@/logger';
 
 const app = express();
 

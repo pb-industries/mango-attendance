@@ -1,11 +1,11 @@
-import { getConnection } from '../../util/db';
+import { getConnection } from '@/util/db';
 
-export default async (raidId: number): Promise<{ data: string }> => {
-  const raid = await getConnection().from('raid').where('id', raidId).first();
-  if (!raid) {
-    throw new Error(`Raid ${raidId} not found`);
-  }
-
-  await getConnection().from('raid').where('id', raidId).del();
-  return { data: `Raid ${raidId} deleted` };
+export default async (raidId: number[]): Promise<{ data: number[] }> => {
+  const knex = await getConnection();
+  await knex.from('raid').whereIn('id', raidId).del();
+  const remainingIds = await (
+    await knex('raid').select('id').whereIn('id', raidId)
+  ).map((row) => row.id);
+  const deletedIds = raidId.filter((id) => !remainingIds.includes(id));
+  return { data: deletedIds };
 };

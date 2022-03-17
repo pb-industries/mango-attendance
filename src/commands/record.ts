@@ -1,7 +1,7 @@
 // @ts-ignore
 import Tail from 'tail-file';
-import addRaid from './raids/add';
-import { log } from '../logger';
+import addRaid from '@/commands/raids/add';
+import { log } from '@/logger';
 
 let recording = false;
 const attendees: string[] = [];
