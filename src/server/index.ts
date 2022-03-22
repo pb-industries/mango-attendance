@@ -44,14 +44,15 @@ app.post('/raid', async (req, res) => {
 });
 
 app.post('/raid/tick', async (req, res) => {
-  let { raid_id, player_names } = req.body;
+  let { raid_id, player_names, final_tick } = req.body;
   if (!raid_id || !player_names) {
     res.status(400).send('Missing raid id or player names');
   } else {
     if (typeof player_names === 'string') {
       player_names = player_names.split(',');
     }
-    const tickResult = await recordTick(raid_id, player_names);
+    const isFinalTick = final_tick ? 1 : 0;
+    const tickResult = await recordTick(raid_id, player_names, isFinalTick);
     await calculateAttendance();
     res.status(200).send({ data: { tick_result: tickResult } });
   }
