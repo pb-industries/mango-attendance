@@ -53,7 +53,7 @@ app.post('/raid/tick', async (req, res) => {
     if (typeof player_names === 'string') {
       player_names = player_names.split(',');
     }
-    const isFinalTick = final_tick ? 1 : 0;
+    const isFinalTick = final_tick ? true : false;
     const tickResult = await recordTick(raid_id, player_names, isFinalTick);
     await calculateAttendance();
     res.status(200).send({ data: { tick_result: tickResult } });
