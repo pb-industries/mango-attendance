@@ -19,12 +19,14 @@ import addRaffle from '@/commands/raffle/add';
 import fetchRaffleRolls from '@/commands/raffle/fetch-roll';
 import { __port__ } from '@/constants';
 import { log } from '@/logger';
+import cors from 'cors';
 
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(expressPino({ logger: log }));
+app.use(cors({ origin: '*' }));
 
 app.use((_req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
