@@ -17,6 +17,7 @@ export const getKeyFile = () => {
     json = JSON.parse(
       Buffer.from(process.env.GOOGLE_SHEET_KEY_FILE as string).toString('utf8')
     );
+    log.info(json);
   } catch (e) {
     json = process.env.GOOGLE_SHEET_KEY_FILE as {};
   }
@@ -25,6 +26,7 @@ export const getKeyFile = () => {
     throw new Error('Invalid Auth credentials');
   }
 
+  log.info(json);
   return json;
 };
 
