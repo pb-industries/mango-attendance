@@ -28,7 +28,7 @@ export const getKeyFile = () => {
 const init = async (): Promise<void> => {
   if (!auth) {
     const credentials = getKeyFile();
-    console.log(credentials);
+    console.log('creds', credentials);
     auth = new google.auth.GoogleAuth({
       credentials,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
