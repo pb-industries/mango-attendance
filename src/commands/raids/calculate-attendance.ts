@@ -1,7 +1,7 @@
 import { Knex } from 'knex';
 import { log } from '@/logger';
 import { getConnection } from '@/util/db';
-// import { getSheets } from "@/util/googleApi";
+import { getSheets } from '@/util/googleApi';
 
 type Attendance =
   | 'attendance_life'
@@ -69,7 +69,7 @@ export default async () => {
 
     // In order to emulate replacing the whole sheet, insert a bunch of blank
     // cells incase members are ever removed
-    const blankRows = 10;
+    const blankRows = 50;
     for (let j = blankRows; j > 0; j--) {
       sheetRows.push(['', 0, 0, 0, 0]);
     }
@@ -78,11 +78,13 @@ export default async () => {
       await Promise.all(updates);
       await trx.commit();
       log.info(`Successfully updated attendance of all members.`);
-      // await updateSheet(sheetRows);
+      await updateSheet(sheetRows);
     } catch (e) {
       log.error(e);
       log.error('unexpected error when saving attendance');
       await trx.rollback();
+      throw e;
+    } finally {
       process.exit(1);
     }
   });
@@ -130,30 +132,28 @@ const daysInRange = async (
     .groupBy(knex.raw('pr.player_id, p.name'));
 };
 
-// const updateSheet = async (playerAttendance: (string | number)[][]) => {
-//   const spreadsheetId = process.env.GOOGLE_SHEET_ID;
-//   const range = "Attendance!A2:E";
+const updateSheet = async (playerAttendance: (string | number)[][]) => {
+  const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+  const range = 'Attendance!A2:E';
 
-//   const sheets = await getSheets();
-//   sheets.spreadsheets.values.update(
-//     {
-//       spreadsheetId,
-//       range,
-//       valueInputOption: "USER_ENTERED",
-//       // @ts-ignore
-//       resource: {
-//         values: playerAttendance,
-//       },
-//     },
-//     (err: any) => {
-//       if (err) {
-//         console.log(chalk.red(`The API returned an error: ${err}`));
-//         return;
-//       } else {
-//         console.log(
-//           chalk.green.bold(`Successfully updated attendance spreadsheet.`)
-//         );
-//       }
-//     }
-//   );
-// };
+  const sheets = await getSheets();
+  sheets.spreadsheets.values.update(
+    {
+      spreadsheetId,
+      range,
+      valueInputOption: 'USER_ENTERED',
+      // @ts-ignore
+      resource: {
+        values: playerAttendance,
+      },
+    },
+    (err: any) => {
+      if (err) {
+        log.error(`The API returned an error: ${err}`);
+        return;
+      } else {
+        log.info(`Successfully updated attendance spreadsheet.`);
+      }
+    }
+  );
+};

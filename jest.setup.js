@@ -1,5 +1,9 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
 import conn from 'knex';
+
+dotenv.config({ path: '.env.test' });
+
+console.log(process.env.DB_CLUSTER);
 
 if (process.env.NODE_ENV !== 'integration') {
   jest.mock('ioredis', () => jest.requireActual('ioredis-mock/jest'));
