@@ -14,10 +14,7 @@ let auth: Auth.GoogleAuth | null;
 export const getKeyFile = () => {
   var json: Auth.CredentialBody = {};
   try {
-    json = JSON.parse(
-      Buffer.from(process.env.GOOGLE_SHEET_KEY_FILE as string).toString('utf8')
-    );
-    log.info(json);
+    json = JSON.parse(process.env.GOOGLE_SHEET_KEY_FILE as string);
   } catch (e) {
     json = process.env.GOOGLE_SHEET_KEY_FILE as {};
   }
@@ -27,7 +24,7 @@ export const getKeyFile = () => {
     throw new Error('Invalid Auth credentials');
   }
 
-  log.info(json);
+  log.info('json is', json);
   return json;
 };
 
