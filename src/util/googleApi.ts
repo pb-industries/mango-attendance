@@ -23,6 +23,7 @@ export const getKeyFile = () => {
   }
 
   if (!json?.private_key || !json?.client_email) {
+    log.info(process.env.GOOGLE_SHEET_KEY_FILE);
     throw new Error('Invalid Auth credentials');
   }
 
