@@ -84,8 +84,6 @@ export default async () => {
       log.error('unexpected error when saving attendance');
       await trx.rollback();
       throw e;
-    } finally {
-      process.exit(1);
     }
   });
 };

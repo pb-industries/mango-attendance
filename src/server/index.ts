@@ -20,7 +20,6 @@ import fetchRaffleRolls from '@/commands/raffle/fetch-roll';
 import { __port__ } from '@/constants';
 import { log } from '@/logger';
 import cors from 'cors';
-import { getKeyFile } from '@/util/googleApi';
 
 const app = express();
 
@@ -162,6 +161,5 @@ app.get('/health', async (_, res) => {
 });
 
 app.listen(__port__, async () => {
-  getKeyFile();
   console.log(`Listening on port ${__port__}`);
 });
