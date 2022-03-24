@@ -1,5 +1,4 @@
 import { google, Auth, sheets_v4 } from 'googleapis';
-import { log } from '@/logger';
 
 let client:
   | Auth.Compute
