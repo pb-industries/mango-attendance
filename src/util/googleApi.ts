@@ -14,7 +14,9 @@ let auth: Auth.GoogleAuth | null;
 export const getKeyFile = () => {
   var json: Auth.CredentialBody = {};
   try {
-    json = JSON.parse(process.env.GOOGLE_SHEET_KEY_FILE as string);
+    json = JSON.parse(
+      Buffer.from(process.env.GOOGLE_SHEET_KEY_FILE as string).toString('utf8')
+    );
   } catch (e) {
     json = process.env.GOOGLE_SHEET_KEY_FILE as {};
   }
