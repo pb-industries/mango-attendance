@@ -13,10 +13,9 @@ let auth: Auth.GoogleAuth | null;
 
 const init = async (): Promise<void> => {
   if (!auth) {
-    const creds = JSON.parse(process.env.GOOGLE_SHEET_KEY_FILE as string);
-    log.info('creds');
-    console.log(creds);
-    log.info(creds);
+    const creds = JSON.parse(
+      (process.env.GOOGLE_SHEET_KEY_FILE as string).replace(/\\n/g, '')
+    );
     auth = new google.auth.GoogleAuth({
       credentials: creds,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
