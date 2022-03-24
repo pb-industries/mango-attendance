@@ -1,4 +1,5 @@
 import { google, Auth, sheets_v4 } from 'googleapis';
+import { log } from '@/logger';
 
 let client:
   | Auth.Compute
@@ -28,7 +29,7 @@ export const getKeyFile = () => {
 const init = async (): Promise<void> => {
   if (!auth) {
     const credentials = getKeyFile();
-    console.log('creds', credentials);
+    log.info('creds', credentials);
     auth = new google.auth.GoogleAuth({
       credentials,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
