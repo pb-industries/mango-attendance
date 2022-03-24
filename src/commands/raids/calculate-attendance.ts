@@ -71,7 +71,7 @@ export default async () => {
     // cells incase members are ever removed
     const blankRows = 50;
     for (let j = blankRows; j > 0; j--) {
-      sheetRows.push(['', 0, 0, 0, 0]);
+      sheetRows.push(['', '', '', '', '']);
     }
 
     try {

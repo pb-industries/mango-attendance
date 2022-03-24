@@ -1,5 +1,4 @@
 import { google, Auth, sheets_v4 } from 'googleapis';
-import fs from 'fs';
 
 let client:
   | Auth.Compute
@@ -12,25 +11,26 @@ let client:
 let auth: Auth.GoogleAuth | null;
 
 export const getKeyFile = () => {
-  if (!fs.existsSync('./googleKey.json')) {
-    var json = null;
-    try {
-      json = JSON.parse(process.env.GOOGLE_SHEET_KEY_FILE as string);
-    } catch (e) {
-      json = process.env.GOOGLE_SHEET_KEY_FILE;
-    }
-
-    console.log(json);
-    fs.writeFileSync('./googleKey.json', JSON.stringify(json));
+  var json: Auth.CredentialBody = {};
+  try {
+    json = JSON.parse(process.env.GOOGLE_SHEET_KEY_FILE as string);
+  } catch (e) {
+    json = process.env.GOOGLE_SHEET_KEY_FILE as {};
   }
 
-  return './googleKey.json';
+  if (!json?.private_key || !json?.client_email) {
+    throw new Error('Invalid Auth credentials');
+  }
+
+  return json;
 };
 
 const init = async (): Promise<void> => {
   if (!auth) {
+    const credentials = getKeyFile();
+    console.log(credentials);
     auth = new google.auth.GoogleAuth({
-      keyFile: await getKeyFile(),
+      credentials,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
   }
