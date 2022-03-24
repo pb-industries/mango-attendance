@@ -11,29 +11,14 @@ let client:
 
 let auth: Auth.GoogleAuth | null;
 
-export const getKeyFile = () => {
-  var json: Auth.CredentialBody = {};
-  try {
-    json = JSON.parse(process.env.GOOGLE_SHEET_KEY_FILE as string);
-  } catch (e) {
-    json = process.env.GOOGLE_SHEET_KEY_FILE as {};
-  }
-
-  if (!json?.private_key || !json?.client_email) {
-    log.info(process.env.GOOGLE_SHEET_KEY_FILE);
-    throw new Error('Invalid Auth credentials');
-  }
-
-  log.info('json is', json);
-  return json;
-};
-
 const init = async (): Promise<void> => {
   if (!auth) {
-    const credentials = getKeyFile();
-    log.info(credentials);
+    const creds = JSON.parse(process.env.GOOGLE_SHEET_KEY_FILE as string);
+    log.info('creds');
+    console.log(creds);
+    log.info(creds);
     auth = new google.auth.GoogleAuth({
-      credentials,
+      credentials: creds,
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
   }
