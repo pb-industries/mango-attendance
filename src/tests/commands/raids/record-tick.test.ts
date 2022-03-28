@@ -4,6 +4,7 @@ import addRaid from '@/commands/raids/add';
 import fetchPlayer from '@/commands/roster/fetch';
 import calculateAttendance from '@/commands/raids/calculate-attendance';
 import { getConnection } from '@/util/db';
+import addAlt from '@/commands/roster/add-alt';
 
 let raid: Raid;
 const baseDate = new Date();
@@ -62,4 +63,26 @@ it(`will calculate the last 30, 60, 90 days of attendance for each player`, asyn
 
   expect(tankpotato.attendance_30).toBe(100);
   expect(Math.floor(nerduun.attendance_30!)).toBe(33);
+});
+
+it(`if an alt is present on a raid, their attendance counts towards mains`, async () => {
+  const players = await addPlayer([
+    { name: 'tankpotato', class: 'warrior', level: 65 },
+    { name: 'slowpotato', class: 'warrior', level: 65 },
+  ]);
+
+  await addAlt(players[0].id, [players[1]]);
+
+  const raid = await addRaid('Citadel of Anguish', 11);
+  await recordTick(raid.id, ['tankpotato']);
+  await recordTick(raid.id, ['tankpotato'], firstTickTime);
+  await recordTick(raid.id, ['slowpotato'], firstTickTime, true);
+
+  const tankpotato = (await fetchPlayer(players[0].id)).data as Player;
+  const slowpotato = (await fetchPlayer(players[1].id)).data as Player;
+
+  await calculateAttendance();
+
+  expect(tankpotato.attendance_30).toBe(100);
+  expect(Math.floor(slowpotato.attendance_30!)).toBe(0);
 });

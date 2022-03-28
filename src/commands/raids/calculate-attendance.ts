@@ -12,7 +12,7 @@ type Attendance =
 interface AttendanceDatum {
   player_id: number;
   player_name: string;
-  attendance: string; // returned from db as string, we parse to float
+  attendance: number; // returned from db as string, we parse to float
 }
 
 export default async () => {
@@ -26,6 +26,7 @@ export default async () => {
     { name: 'attendance_60', data: await daysInRange(knex, 60) },
     { name: 'attendance_90', data: await daysInRange(knex, 90) },
   ];
+  console.log(attendanceData[1]?.data);
 
   attendanceData.forEach(({ name, data }) => {
     data.forEach(({ player_id, player_name, attendance }) => {
@@ -41,7 +42,7 @@ export default async () => {
       }
 
       if (player_id) {
-        playerAttendance[player_id][name] = parseFloat(attendance);
+        playerAttendance[player_id][name] = parseFloat(`${attendance}`);
       }
     });
   });
@@ -92,10 +93,16 @@ const allTime = async (
   knex: Knex<any, unknown[]>
 ): Promise<AttendanceDatum[]> => {
   console.info('Fetching attendance % for all time');
-  return await knex
+  const aggregatedRows: { [playerId: number]: AttendanceDatum } = {};
+  const rows = await knex
     .select(
       knex.raw(
-        'p.name AS player_name, pr.player_id, round((cast(count(distinct pr.raid_id + pr.raid_hour) as decimal) / cast(count(distinct all_raids.raid_id + all_raids.raid_hour) as decimal) * 100), 2) AS attendance'
+        `
+        if (pa.alt_id = pr.player_id, a.name, p.name) AS player_name,
+        if (pa.alt_id = pr.player_id, pa.player_id, pr.player_id) AS player_id,
+        pr.player_id,
+        round((cast(count(distinct pr.raid_id + pr.raid_hour) as decimal) / cast(count(distinct all_raids.raid_id + all_raids.raid_hour) as decimal) * 100), 2) AS attendance
+        `
       )
     )
     .from(knex.raw('player_raid AS pr'))
@@ -103,18 +110,37 @@ const allTime = async (
       knex.raw('player_raid AS all_raids ON all_raids.raid_id IS NOT NULL')
     )
     .leftJoin(knex.raw('player AS p ON pr.player_id = p.id'))
-    .groupBy(knex.raw('pr.player_id, p.name'));
+    .leftJoin(knex.raw('player_alt pa ON pa.alt_id = pr.player_id'))
+    .leftJoin(knex.raw('player a ON pa.player_id = a.id'))
+    .groupBy(knex.raw('pr.player_id, p.name, pa.alt_id, pa.player_id, a.name'));
+
+  rows.forEach((row: AttendanceDatum) => {
+    if (aggregatedRows?.[row?.player_id]) {
+      aggregatedRows[row.player_id].attendance = parseFloat(
+        `${row.attendance}`
+      );
+    } else {
+      row.attendance = parseFloat(`${row.attendance}`);
+      aggregatedRows[row.player_id] = row;
+    }
+  });
+
+  return Object.values(aggregatedRows);
 };
 
 const daysInRange = async (
   knex: Knex<any, unknown[]>,
   days: number
 ): Promise<AttendanceDatum[]> => {
-  console.info(`Fetching attendance % for the past ${days} days`);
-  return await knex
+  const aggregatedRows: { [playerId: number]: AttendanceDatum } = {};
+  const rows = await knex
     .select(
       knex.raw(
-        'p.name AS player_name, pr.player_id, round((cast(count(distinct pr.raid_id + pr.raid_hour) as decimal) / cast(count(distinct all_raids.raid_id + all_raids.raid_hour) as decimal) * 100), 2) AS attendance'
+        `
+        if (pa.alt_id = pr.player_id, a.name, p.name) AS player_name,
+        if (pa.alt_id = pr.player_id, pa.player_id, pr.player_id) AS player_id,
+        round((cast(count(distinct pr.raid_id + pr.raid_hour) as decimal) / cast(count(distinct all_raids.raid_id + all_raids.raid_hour) as decimal) * 100), 2) AS attendance
+        `
       )
     )
     .from(knex.raw('player_raid AS pr'))
@@ -124,10 +150,25 @@ const daysInRange = async (
       )
     )
     .leftJoin(knex.raw('player AS p ON pr.player_id = p.id'))
+    .leftJoin(knex.raw('player_alt pa ON pa.alt_id = pr.player_id'))
+    .leftJoin(knex.raw('player a ON pa.player_id = a.id'))
     .where(
       knex.raw(`pr.created_at > current_timestamp - interval '${days}' day`)
     )
-    .groupBy(knex.raw('pr.player_id, p.name'));
+    .groupBy(knex.raw('pr.player_id, p.name, pa.alt_id, pa.player_id, a.name'));
+
+  rows.forEach((row: AttendanceDatum) => {
+    if (aggregatedRows?.[row?.player_id]) {
+      aggregatedRows[row.player_id].attendance += parseFloat(
+        `${row.attendance}`
+      );
+    } else {
+      row.attendance = parseFloat(`${row.attendance}`);
+      aggregatedRows[row.player_id] = row;
+    }
+  });
+
+  return Object.values(aggregatedRows);
 };
 
 const updateSheet = async (playerAttendance: (string | number)[][]) => {
