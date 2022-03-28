@@ -28,7 +28,6 @@ it(`should allow alts to be added to mains`, async () => {
     { name: 'chrym', class: 'bard', level: 65 },
     { name: 'kadalah', class: 'cleric', level: 65 },
   ]);
-  console.log(alts);
 
   expect(alts.length).toBe(3);
   expect(alts[0].player_id).toBe(karadin.id);

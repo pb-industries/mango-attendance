@@ -131,6 +131,10 @@ const daysInRange = async (
 };
 
 const updateSheet = async (playerAttendance: (string | number)[][]) => {
+  if (process.env.NODE_ENV === 'test') {
+    return false;
+  }
+
   const spreadsheetId = process.env.GOOGLE_SHEET_ID;
   const range = 'Attendance!A2:E';
 

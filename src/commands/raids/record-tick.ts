@@ -8,34 +8,35 @@ import { log } from '@/logger';
 export default async (
   raidId: string,
   playerNames: string[],
+  tickTime?: number,
   finalTick?: boolean
 ) => {
+  const tickDate = new Date(
+    new Date(tickTime ?? new Date().getTime()).toUTCString()
+  ).toISOString();
   const knex = await getConnection();
   const raid = await knex.from('raid').where('id', raidId).first();
   if (!raid) {
     throw new Error(`Raid ${raidId} not found`);
   }
 
-  const elapsedTicks = await getTotalTicks(raidId);
-  const attendeeMetadata = await fetchPlayers(
-    playerNames,
-    elapsedTicks,
-    raidId,
-    3600
-  );
+  let currentTick = await getCurrentTick(raidId, tickTime);
+  const attendeeMetadata = await fetchPlayers(playerNames);
 
-  const playersToRecord = Object.values(attendeeMetadata)
-    .filter(
-      ({ nextTickElapsed }) => nextTickElapsed === true || finalTick === true
-    )
-    .map(({ id }) => {
-      return {
-        raid_id: raidId,
-        player_id: id,
-        // Tick 0 is our ontime tick =)
-        raid_hour: elapsedTicks + 1,
-      };
-    });
+  if (finalTick) {
+    currentTick += 1;
+  }
+
+  const playersToRecord = Object.values(attendeeMetadata).map((id) => {
+    return {
+      raid_id: raidId,
+      player_id: id,
+      // Tick 0 is our ontime tick =)
+      raid_hour: currentTick,
+      created_at: tickDate,
+      updated_at: tickDate,
+    };
+  });
 
   if (playersToRecord.length) {
     await knex
@@ -47,20 +48,95 @@ export default async (
     log.info('Recorded attendance for ' + playersToRecord.length + ' players');
   }
 
-  const recordedTicks = playersToRecord.length
-    ? elapsedTicks + 1
-    : elapsedTicks;
-  return { playersRecorded: playersToRecord.length, tick: recordedTicks };
+  return { playersRecorded: playersToRecord.length, tick: currentTick };
 };
 
-const getTotalTicks = async (raidId: string): Promise<number> => {
+const getPreviousTickTime = async (raidId: string): Promise<Tick | null> => {
   const knex = await getConnection();
-  const res = await knex
-    .countDistinct({ ticks: 'raid_hour' })
+  const res = (await knex
+    .select([
+      knex.raw(
+        'max(raid_hour) as last_tick, min(created_at) as previous_tick_time'
+      ),
+    ])
     .from('player_raid')
-    .where('raid_id', raidId);
+    .where('raid_id', raidId)
+    .orderBy('raid_hour', 'desc')
+    .groupBy(['raid_id', 'raid_hour'])
+    .having('raid_hour', '>', 0)) as unknown as Tick[];
 
-  return parseInt(`${res[0].ticks ?? 0}`) - 1;
+  const tick = res.pop();
+
+  if (!tick) {
+    return null;
+  }
+
+  return tick;
+};
+
+const getCurrentTick = async (
+  raidId: string,
+  nextTickTime?: number
+): Promise<number> => {
+  const previousTickMeta = await getPreviousTickTime(raidId);
+  const knex = await getConnection();
+
+  const nextTick = new Date(
+    new Date(nextTickTime ?? new Date().getTime()).toUTCString()
+  ).toISOString();
+  const prevTick = new Date(
+    new Date(
+      previousTickMeta?.previous_tick_time ?? new Date().getTime()
+    ).toUTCString()
+  ).toISOString();
+
+  const previousTickClause = previousTickMeta
+    ? `
+    if (
+      extract('minutes' from ('${nextTick}'::TIMESTAMP - '${prevTick}'::TIMESTAMP)) >= 60,
+      max(raid_hour) + 1,
+      max(raid_hour)
+    )
+  `
+    : 'max(raid_hour)';
+
+  const lastTickDelta =
+    previousTickMeta === null || previousTickMeta.last_tick === 0
+      ? `(now() - max(updated_at))`
+      : `(max(updated_at) -  min(updated_at))`;
+
+  const res = await knex
+    .select([
+      knex.raw(
+        `
+          (cast(extract('minutes' from ${lastTickDelta}) as int) * greatest(1, max(raid_hour)) % 60) / 60 AS time_passed,
+          (cast(extract('minutes' from ${lastTickDelta}) as int) * greatest(1, max(raid_hour)) % 60) / 60 > 0.43 AS next_tick_done,
+      if(
+        coalesce(max(raid_hour), 0) = 0,
+        -- If the max minutes elapsed at tick 1 < 10 then count more early tickers
+        -- else roll this over to tick 1.
+        if (extract('minutes' from ('${nextTick}'::TIMESTAMP - min(updated_at))) < 10, 0, 1),
+        -- If the amount of minutes elapsed * latest tick > 60
+        if (
+          -- Work out what proportion of an hour has passed since the last tick, 0.43 = ~26 mins, if
+          -- so we use the next tick, otherwise we take the current tick
+          (cast(extract('minutes' from ${lastTickDelta}) as int) * greatest(1, max(raid_hour)) % 60) / 60 > 0.43,
+          ${previousTickClause},
+          max(raid_hour)
+        )
+      ) AS current_tick
+    `
+      ),
+    ])
+    .from('player_raid')
+    .where('raid_id', raidId)
+    .groupBy('raid_id');
+
+  if (!res?.[0]) {
+    return 0;
+  }
+
+  return parseInt(`${res[0].current_tick ?? 0}`);
 };
 
 /**
@@ -72,46 +148,17 @@ const getTotalTicks = async (raidId: string): Promise<number> => {
  * @param currentTick
  * @returns
  */
-const fetchPlayers = async (
-  attendees: string[],
-  currentTick: number,
-  raidId: string,
-  tickAllowanceThresholdSeconds: number = 3600
-): Promise<AttendeeMetadata> => {
+const fetchPlayers = async (attendees: string[]): Promise<AttendeeMetadata> => {
   const knex = await getConnection();
   const players = await knex
-    .select([
-      'p.id',
-      'p.name',
-      knex.raw(
-        `(pr.raid_id IS NULL OR (${currentTick} < 1 OR EXTRACT(epoch from (now() - COALESCE(last_tick.last_tick_time, pr.created_at))) > ${tickAllowanceThresholdSeconds})) AS next_tick_elapsed`
-      ),
-    ])
+    .select(['p.id', 'p.name'])
     .from('player AS p')
-    .leftJoin(
-      knex.raw(
-        `player_raid AS pr ON pr.player_id = p.id AND pr.raid_id = ${raidId}`
-      )
-    )
-    .leftJoin(
-      knex.raw(
-        `(
-          SELECT player_id, raid_id, MAX(raid_hour) AS max_raid_hour, MAX(created_at) AS last_tick_time
-          FROM player_raid
-          WHERE raid_id = ${raidId}
-          GROUP BY player_id, raid_id
-        ) AS last_tick ON last_tick.player_id = p.id`
-      )
-    )
     .whereIn('p.name', attendees);
 
   const attendeeMetadata: AttendeeMetadata = {};
   players.forEach((player) => {
     if (!attendeeMetadata[player.name.toLowerCase()]) {
-      attendeeMetadata[player.name.toLowerCase()] = {
-        id: player.id,
-        nextTickElapsed: player.next_tick_elapsed,
-      };
+      attendeeMetadata[player.name.toLowerCase()] = player.id;
     }
   });
 

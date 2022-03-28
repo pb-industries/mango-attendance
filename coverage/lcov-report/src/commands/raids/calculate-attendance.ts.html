@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">45.71% </span>
+                <span class="strong">36.17% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>16/35</span>
+                <span class='fraction'>17/47</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">75% </span>
+                <span class="strong">37.5% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>3/4</span>
+                <span class='fraction'>3/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">71.42% </span>
+                <span class="strong">55.55% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>5/7</span>
+                <span class='fraction'>5/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">47.05% </span>
+                <span class="strong">36.95% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>16/34</span>
+                <span class='fraction'>17/46</span>
             </div>
         
             
@@ -222,7 +222,9 @@
 <a name='L157'></a><a href='#L157'>157</a>
 <a name='L158'></a><a href='#L158'>158</a>
 <a name='L159'></a><a href='#L159'>159</a>
-<a name='L160'></a><a href='#L160'>160</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -302,7 +304,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -354,6 +356,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -364,19 +376,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -384,7 +388,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Knex } from 'knex';
 import { log } from '@/logger';
 import { getConnection } from '@/util/db';
-// import { getSheets } from "@/util/googleApi";
+import { getSheets } from '@/util/googleApi';
 &nbsp;
 type Attendance =
   | 'attendance_life'
@@ -452,21 +456,21 @@ export default async () =&gt; {
 &nbsp;
     // In order to emulate replacing the whole sheet, insert a bunch of blank
     // cells incase members are ever removed
-    const blankRows = <span class="cstat-no" title="statement not covered" >10;</span>
+    const blankRows = <span class="cstat-no" title="statement not covered" >50;</span>
 <span class="cstat-no" title="statement not covered" >    for (let j = <span class="cstat-no" title="statement not covered" >blankRows;</span> j &gt; 0; j--) {</span>
-<span class="cstat-no" title="statement not covered" >      sheetRows.push(['', 0, 0, 0, 0]);</span>
+<span class="cstat-no" title="statement not covered" >      sheetRows.push(['', '', '', '', '']);</span>
     }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    try {</span>
 <span class="cstat-no" title="statement not covered" >      await Promise.all(updates);</span>
 <span class="cstat-no" title="statement not covered" >      await trx.commit();</span>
 <span class="cstat-no" title="statement not covered" >      log.info(`Successfully updated attendance of all members.`);</span>
-      // await updateSheet(sheetRows);
+<span class="cstat-no" title="statement not covered" >      await updateSheet(sheetRows);</span>
     } catch (e) {
 <span class="cstat-no" title="statement not covered" >      log.error(e);</span>
 <span class="cstat-no" title="statement not covered" >      log.error('unexpected error when saving attendance');</span>
 <span class="cstat-no" title="statement not covered" >      await trx.rollback();</span>
-<span class="cstat-no" title="statement not covered" >      process.exit(1);</span>
+<span class="cstat-no" title="statement not covered" >      throw e;</span>
     }
   });
 };
@@ -513,33 +517,35 @@ const daysInRange = async (
     .groupBy(knex.raw('pr.player_id, p.name'));
 };
 &nbsp;
-// const updateSheet = async (playerAttendance: (string | number)[][]) =&gt; {
-//   const spreadsheetId = process.env.GOOGLE_SHEET_ID;
-//   const range = "Attendance!A2:E";
+const updateSheet = <span class="fstat-no" title="function not covered" >as</span>ync (playerAttendance: (string | number)[][]) =&gt; {
+<span class="cstat-no" title="statement not covered" >  if (process.env.NODE_ENV === 'test') {</span>
+<span class="cstat-no" title="statement not covered" >    return false;</span>
+  }
 &nbsp;
-//   const sheets = await getSheets();
-//   sheets.spreadsheets.values.update(
-//     {
-//       spreadsheetId,
-//       range,
-//       valueInputOption: "USER_ENTERED",
-//       // @ts-ignore
-//       resource: {
-//         values: playerAttendance,
-//       },
-//     },
-//     (err: any) =&gt; {
-//       if (err) {
-//         console.log(chalk.red(`The API returned an error: ${err}`));
-//         return;
-//       } else {
-//         console.log(
-//           chalk.green.bold(`Successfully updated attendance spreadsheet.`)
-//         );
-//       }
-//     }
-//   );
-// };
+  const spreadsheetId = <span class="cstat-no" title="statement not covered" >process.env.GOOGLE_SHEET_ID;</span>
+  const range = <span class="cstat-no" title="statement not covered" >'Attendance!A2:E';</span>
+&nbsp;
+  const sheets = <span class="cstat-no" title="statement not covered" >await getSheets();</span>
+<span class="cstat-no" title="statement not covered" >  sheets.spreadsheets.values.update(</span>
+    {
+      spreadsheetId,
+      range,
+      valueInputOption: 'USER_ENTERED',
+      // @ts-ignore
+      resource: {
+        values: playerAttendance,
+      },
+    },
+<span class="fstat-no" title="function not covered" >    (e</span>rr: any) =&gt; {
+<span class="cstat-no" title="statement not covered" >      if (err) {</span>
+<span class="cstat-no" title="statement not covered" >        log.error(`The API returned an error: ${err}`);</span>
+<span class="cstat-no" title="statement not covered" >        return;</span>
+      } else {
+<span class="cstat-no" title="statement not covered" >        log.info(`Successfully updated attendance spreadsheet.`);</span>
+      }
+    }
+  );
+};
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -547,7 +553,7 @@ const daysInRange = async (
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Wed Mar 23 2022 14:27:05 GMT+0000 (Greenwich Mean Time)
+                at Mon Mar 28 2022 15:17:23 GMT+0100 (British Summer Time)
             </div>
         <script src="../../../prettify.js"></script>
         <script>

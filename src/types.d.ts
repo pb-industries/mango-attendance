@@ -72,7 +72,7 @@ type Direction = 'asc' | 'desc';
 type LogLevel = 'info' | 'debug' | 'error' | 'warning' | 'silent';
 
 interface AttendeeMetadata {
-  [key: string]: { id: number; nextTickElapsed: boolean };
+  [key: string]: number;
 }
 
 interface CacheConfig {
@@ -82,4 +82,9 @@ interface CacheConfig {
   port: number;
   debug: boolean;
   driver: string;
+}
+
+interface Tick {
+  previous_tick_time: string;
+  last_tick: number;
 }
