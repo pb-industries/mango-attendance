@@ -102,8 +102,8 @@ const getCurrentTick = async (
 
   const lastTickDelta =
     previousTickMeta === null || previousTickMeta.last_tick === 0
-      ? `(now() - max(updated_at))`
-      : `(max(updated_at) -  min(updated_at))`;
+      ? `(now() - max(created_at))`
+      : `(max(created_at) -  min(created_at))`;
 
   const res = await knex
     .select([
