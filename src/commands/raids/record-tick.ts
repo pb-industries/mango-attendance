@@ -65,6 +65,11 @@ const getPreviousTickTime = async (raidId: string): Promise<Tick | null> => {
     .groupBy(['raid_id', 'raid_hour'])
     .having('raid_hour', '>', 0)) as unknown as Tick[];
 
+  if (res.length === 1) {
+    return res[0];
+  }
+
+  res.pop();
   const tick = res.pop();
 
   if (!tick) {
@@ -95,7 +100,7 @@ const getCurrentTick = async (
     if (
       extract('minutes' from ('${nextTick}'::TIMESTAMP - '${prevTick}'::TIMESTAMP)) >= 60,
       max(raid_hour) + 1,
-      max(raid_hour)
+      max(raid_hour) + 1
     )
   `
     : 'max(raid_hour)';

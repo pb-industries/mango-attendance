@@ -261,7 +261,11 @@
 <a name='L196'></a><a href='#L196'>196</a>
 <a name='L197'></a><a href='#L197'>197</a>
 <a name='L198'></a><a href='#L198'>198</a>
-<a name='L199'></a><a href='#L199'>199</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L199'></a><a href='#L199'>199</a>
+<a name='L200'></a><a href='#L200'>200</a>
+<a name='L201'></a><a href='#L201'>201</a>
+<a name='L202'></a><a href='#L202'>202</a>
+<a name='L203'></a><a href='#L203'>203</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -293,7 +297,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">13x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -304,8 +308,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">13x</span>
+<span class="cline-any cline-yes">13x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -381,10 +385,12 @@
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -422,10 +428,12 @@
 <span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -473,7 +481,7 @@ type Attendance =
 interface AttendanceDatum {
   player_id: number;
   player_name: string;
-  attendance: string; // returned from db as string, we parse to float
+  attendance: number; // returned from db as string, we parse to float
 }
 &nbsp;
 export default async () =&gt; {
@@ -503,7 +511,7 @@ export default async () =&gt; {
       }
 &nbsp;
       <span class="missing-if-branch" title="else path not taken" >E</span>if (player_id) {
-        playerAttendance[player_id][name] = parseFloat(attendance);
+        playerAttendance[player_id][name] = parseFloat(`${attendance}`);
       }
     });
   });
@@ -577,14 +585,16 @@ const allTime = async (
 &nbsp;
   rows.forEach((row: AttendanceDatum) =&gt; {
     <span class="missing-if-branch" title="if path not taken" >I</span>if (aggregatedRows?.[row?.player_id]) {
-<span class="cstat-no" title="statement not covered" >      aggregatedRows[row.player_id].attendance += row.attendance;</span>
+<span class="cstat-no" title="statement not covered" >      aggregatedRows[row.player_id].attendance = parseFloat(</span>
+        `${row.attendance}`
+      );
     } else {
+      row.attendance = parseFloat(`${row.attendance}`);
       aggregatedRows[row.player_id] = row;
     }
   });
-  console.log(rows);
 &nbsp;
-  return Object.values(rows);
+  return Object.values(aggregatedRows);
 };
 &nbsp;
 const daysInRange = async (
@@ -618,14 +628,16 @@ const daysInRange = async (
 &nbsp;
   rows.forEach((row: AttendanceDatum) =&gt; {
     if (aggregatedRows?.[row?.player_id]) {
-      aggregatedRows[row.player_id].attendance += row.attendance;
+      aggregatedRows[row.player_id].attendance += parseFloat(
+        `${row.attendance}`
+      );
     } else {
+      row.attendance = parseFloat(`${row.attendance}`);
       aggregatedRows[row.player_id] = row;
     }
   });
-  console.log(rows);
 &nbsp;
-  return Object.values(rows);
+  return Object.values(aggregatedRows);
 };
 &nbsp;
 const updateSheet = async (playerAttendance: (string | number)[][]) =&gt; {
@@ -637,7 +649,7 @@ const updateSheet = async (playerAttendance: (string | number)[][]) =&gt; {
   const range = <span class="cstat-no" title="statement not covered" >'Attendance!A2:E';</span>
 &nbsp;
   const sheets = <span class="cstat-no" title="statement not covered" >await getSheets();</span>
-<span class="cstat-no" title="statement not covered" >  sheets.spreadsheets.values.update(</span>
+<span class="cstat-no" title="statement not covered" >  return sheets.spreadsheets.values.update(</span>
     {
       spreadsheetId,
       range,
@@ -664,7 +676,7 @@ const updateSheet = async (playerAttendance: (string | number)[][]) =&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at Mon Mar 28 2022 17:22:35 GMT+0100 (British Summer Time)
+                at Tue Mar 29 2022 18:48:57 GMT+0100 (British Summer Time)
             </div>
         <script src="../../../prettify.js"></script>
         <script>
