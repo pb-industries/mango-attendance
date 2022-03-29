@@ -115,7 +115,7 @@ const getCurrentTick = async (
         coalesce(max(raid_hour), 0) = 0,
         -- If the max minutes elapsed at tick 1 < 10 then count more early tickers
         -- else roll this over to tick 1.
-        if (extract('minutes' from ('${nextTick}'::TIMESTAMP - min(updated_at))) < 10, 0, 1),
+        if (extract('minutes' from ('${nextTick}'::TIMESTAMP - min(created_at))) < 10, 0, 1),
         -- If the amount of minutes elapsed * latest tick > 60
         if (
           -- Work out what proportion of an hour has passed since the last tick, 0.43 = ~26 mins, if
