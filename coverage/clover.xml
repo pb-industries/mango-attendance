@@ -1,246 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1648576137997" clover="3.2.0">
-  <project timestamp="1648576137997" name="All files">
-    <metrics statements="193" coveredstatements="160" conditionals="84" coveredconditionals="49" methods="38" coveredmethods="33" elements="315" coveredelements="242" complexity="0" loc="193" ncloc="193" packages="4" files="12" classes="12"/>
+<coverage generated="1648632404162" clover="3.2.0">
+  <project timestamp="1648632404162" name="All files">
+    <metrics statements="73" coveredstatements="67" conditionals="52" coveredconditionals="35" methods="10" coveredmethods="9" elements="135" coveredelements="111" complexity="0" loc="73" ncloc="73" packages="3" files="5" classes="5"/>
     <package name="src">
       <metrics statements="7" coveredstatements="6" conditionals="16" coveredconditionals="8" methods="1" coveredmethods="0"/>
       <file name="constants.ts" path="/home/alexmk92/code/bnc-attendance/src/constants.ts">
         <metrics statements="3" coveredstatements="3" conditionals="14" coveredconditionals="8" methods="0" coveredmethods="0"/>
-        <line num="1" count="5" type="stmt"/>
-        <line num="2" count="5" type="cond" truecount="1" falsecount="1"/>
-        <line num="3" count="5" type="stmt"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="3" count="1" type="stmt"/>
       </file>
       <file name="logger.ts" path="/home/alexmk92/code/bnc-attendance/src/logger.ts">
         <metrics statements="4" coveredstatements="3" conditionals="2" coveredconditionals="0" methods="1" coveredmethods="0"/>
-        <line num="3" count="2" type="stmt"/>
-        <line num="9" count="2" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="9" count="1" type="stmt"/>
         <line num="10" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="16" count="2" type="stmt"/>
+        <line num="16" count="1" type="stmt"/>
       </file>
     </package>
     <package name="src.commands.raids">
-      <metrics statements="132" coveredstatements="115" conditionals="50" coveredconditionals="36" methods="23" coveredmethods="21"/>
+      <metrics statements="61" coveredstatements="56" conditionals="34" coveredconditionals="25" methods="8" coveredmethods="8"/>
       <file name="add.ts" path="/home/alexmk92/code/bnc-attendance/src/commands/raids/add.ts">
-        <metrics statements="19" coveredstatements="18" conditionals="8" coveredconditionals="5" methods="2" coveredmethods="2"/>
-        <line num="4" count="13" type="stmt"/>
-        <line num="5" count="13" type="cond" truecount="1" falsecount="1"/>
-        <line num="6" count="0" type="stmt"/>
-        <line num="9" count="13" type="stmt"/>
-        <line num="11" count="13" type="stmt"/>
-        <line num="18" count="13" type="cond" truecount="2" falsecount="0"/>
-        <line num="19" count="6" type="stmt"/>
-        <line num="20" count="6" type="stmt"/>
-        <line num="21" count="6" type="stmt"/>
-        <line num="23" count="7" type="stmt"/>
-        <line num="33" count="7" type="stmt"/>
-        <line num="36" count="13" type="stmt"/>
-        <line num="46" count="3" type="stmt"/>
-        <line num="47" count="13" type="stmt"/>
-        <line num="49" count="13" type="stmt"/>
-        <line num="50" count="13" type="cond" truecount="1" falsecount="1"/>
-        <line num="52" count="13" type="stmt"/>
-        <line num="53" count="13" type="cond" truecount="1" falsecount="1"/>
-        <line num="55" count="13" type="stmt"/>
-      </file>
-      <file name="calculate-attendance.ts" path="/home/alexmk92/code/bnc-attendance/src/commands/raids/calculate-attendance.ts">
-        <metrics statements="60" coveredstatements="47" conditionals="12" coveredconditionals="7" methods="11" coveredmethods="10"/>
-        <line num="19" count="2" type="stmt"/>
-        <line num="22" count="2" type="stmt"/>
-        <line num="23" count="2" type="stmt"/>
-        <line num="29" count="2" type="stmt"/>
-        <line num="31" count="2" type="stmt"/>
-        <line num="32" count="8" type="stmt"/>
-        <line num="33" count="13" type="cond" truecount="2" falsecount="0"/>
-        <line num="34" count="4" type="stmt"/>
-        <line num="44" count="13" type="cond" truecount="1" falsecount="1"/>
-        <line num="45" count="13" type="stmt"/>
-        <line num="50" count="2" type="stmt"/>
-        <line num="51" count="1" type="stmt"/>
-        <line num="52" count="1" type="stmt"/>
-        <line num="53" count="2" type="stmt"/>
-        <line num="54" count="2" type="stmt"/>
-        <line num="55" count="2" type="stmt"/>
-        <line num="57" count="2" type="stmt"/>
-        <line num="65" count="2" type="stmt"/>
-        <line num="73" count="1" type="stmt"/>
-        <line num="74" count="1" type="stmt"/>
-        <line num="75" count="50" type="stmt"/>
-        <line num="78" count="1" type="stmt"/>
-        <line num="79" count="1" type="stmt"/>
-        <line num="80" count="1" type="stmt"/>
-        <line num="81" count="1" type="stmt"/>
-        <line num="82" count="1" type="stmt"/>
-        <line num="84" count="0" type="stmt"/>
-        <line num="85" count="0" type="stmt"/>
-        <line num="86" count="0" type="stmt"/>
-        <line num="87" count="0" type="stmt"/>
-        <line num="92" count="1" type="stmt"/>
-        <line num="95" count="2" type="stmt"/>
-        <line num="96" count="2" type="stmt"/>
-        <line num="97" count="2" type="stmt"/>
-        <line num="117" count="2" type="stmt"/>
-        <line num="118" count="4" type="cond" truecount="1" falsecount="1"/>
-        <line num="119" count="0" type="stmt"/>
-        <line num="123" count="4" type="stmt"/>
-        <line num="124" count="4" type="stmt"/>
-        <line num="128" count="2" type="stmt"/>
-        <line num="131" count="1" type="stmt"/>
-        <line num="135" count="6" type="stmt"/>
-        <line num="136" count="6" type="stmt"/>
-        <line num="160" count="6" type="stmt"/>
-        <line num="161" count="12" type="cond" truecount="2" falsecount="0"/>
-        <line num="162" count="3" type="stmt"/>
-        <line num="166" count="9" type="stmt"/>
-        <line num="167" count="9" type="stmt"/>
-        <line num="171" count="6" type="stmt"/>
-        <line num="174" count="1" type="stmt"/>
-        <line num="175" count="1" type="cond" truecount="1" falsecount="1"/>
-        <line num="176" count="1" type="stmt"/>
-        <line num="179" count="0" type="stmt"/>
-        <line num="180" count="0" type="stmt"/>
-        <line num="182" count="0" type="stmt"/>
-        <line num="183" count="0" type="stmt"/>
-        <line num="194" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="195" count="0" type="stmt"/>
-        <line num="196" count="0" type="stmt"/>
-        <line num="198" count="0" type="stmt"/>
-      </file>
-      <file name="delete.ts" path="/home/alexmk92/code/bnc-attendance/src/commands/raids/delete.ts">
-        <metrics statements="6" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="2"/>
+        <metrics statements="19" coveredstatements="16" conditionals="8" coveredconditionals="4" methods="2" coveredmethods="2"/>
         <line num="4" count="1" type="stmt"/>
-        <line num="5" count="1" type="stmt"/>
-        <line num="6" count="1" type="stmt"/>
-        <line num="8" count="0" type="stmt"/>
+        <line num="5" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="6" count="0" type="stmt"/>
         <line num="9" count="1" type="stmt"/>
-        <line num="10" count="1" type="stmt"/>
-      </file>
-      <file name="fetch.ts" path="/home/alexmk92/code/bnc-attendance/src/commands/raids/fetch.ts">
-        <metrics statements="6" coveredstatements="5" conditionals="4" coveredconditionals="2" methods="1" coveredmethods="1"/>
-        <line num="9" count="1" type="stmt"/>
-        <line num="10" count="1" type="stmt"/>
-        <line num="11" count="1" type="cond" truecount="1" falsecount="1"/>
-        <line num="12" count="0" type="stmt"/>
-        <line num="14" count="1" type="stmt"/>
+        <line num="11" count="1" type="stmt"/>
+        <line num="18" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="19" count="1" type="stmt"/>
+        <line num="20" count="1" type="stmt"/>
         <line num="21" count="1" type="stmt"/>
+        <line num="23" count="0" type="stmt"/>
+        <line num="33" count="0" type="stmt"/>
+        <line num="36" count="1" type="stmt"/>
+        <line num="46" count="1" type="stmt"/>
+        <line num="47" count="1" type="stmt"/>
+        <line num="49" count="1" type="stmt"/>
+        <line num="50" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="52" count="1" type="stmt"/>
+        <line num="53" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="55" count="1" type="stmt"/>
       </file>
       <file name="record-tick.ts" path="/home/alexmk92/code/bnc-attendance/src/commands/raids/record-tick.ts">
-        <metrics statements="41" coveredstatements="40" conditionals="26" coveredconditionals="22" methods="6" coveredmethods="6"/>
-        <line num="14" count="15" type="stmt"/>
-        <line num="17" count="15" type="stmt"/>
-        <line num="18" count="15" type="stmt"/>
-        <line num="19" count="15" type="cond" truecount="1" falsecount="1"/>
+        <metrics statements="42" coveredstatements="40" conditionals="26" coveredconditionals="21" methods="6" coveredmethods="6"/>
+        <line num="14" count="5" type="stmt"/>
+        <line num="17" count="5" type="stmt"/>
+        <line num="18" count="5" type="stmt"/>
+        <line num="19" count="5" type="cond" truecount="1" falsecount="1"/>
         <line num="20" count="0" type="stmt"/>
-        <line num="23" count="15" type="stmt"/>
-        <line num="24" count="15" type="stmt"/>
-        <line num="26" count="15" type="cond" truecount="2" falsecount="0"/>
-        <line num="27" count="3" type="stmt"/>
-        <line num="30" count="15" type="stmt"/>
-        <line num="31" count="16" type="stmt"/>
-        <line num="41" count="15" type="cond" truecount="1" falsecount="1"/>
-        <line num="42" count="15" type="stmt"/>
-        <line num="48" count="15" type="stmt"/>
-        <line num="51" count="15" type="stmt"/>
+        <line num="23" count="5" type="stmt"/>
+        <line num="24" count="5" type="stmt"/>
+        <line num="26" count="5" type="cond" truecount="1" falsecount="1"/>
+        <line num="27" count="0" type="stmt"/>
+        <line num="30" count="5" type="stmt"/>
+        <line num="31" count="5" type="stmt"/>
+        <line num="41" count="5" type="cond" truecount="1" falsecount="1"/>
+        <line num="42" count="5" type="stmt"/>
+        <line num="48" count="5" type="stmt"/>
+        <line num="51" count="5" type="stmt"/>
         <line num="54" count="1" type="stmt"/>
-        <line num="55" count="15" type="stmt"/>
-        <line num="56" count="15" type="stmt"/>
-        <line num="68" count="15" type="stmt"/>
-        <line num="70" count="15" type="cond" truecount="2" falsecount="0"/>
-        <line num="71" count="11" type="stmt"/>
-        <line num="74" count="4" type="stmt"/>
-        <line num="77" count="1" type="stmt"/>
-        <line num="81" count="15" type="stmt"/>
-        <line num="82" count="15" type="stmt"/>
-        <line num="84" count="15" type="stmt"/>
-        <line num="87" count="15" type="stmt"/>
-        <line num="93" count="15" type="cond" truecount="2" falsecount="0"/>
-        <line num="104" count="15" type="cond" truecount="4" falsecount="0"/>
-        <line num="108" count="15" type="stmt"/>
-        <line num="135" count="15" type="cond" truecount="2" falsecount="0"/>
-        <line num="136" count="5" type="stmt"/>
-        <line num="139" count="10" type="cond" truecount="1" falsecount="1"/>
-        <line num="151" count="1" type="stmt"/>
-        <line num="152" count="15" type="stmt"/>
-        <line num="153" count="15" type="stmt"/>
-        <line num="158" count="15" type="stmt"/>
-        <line num="159" count="15" type="stmt"/>
-        <line num="160" count="16" type="cond" truecount="1" falsecount="1"/>
-        <line num="161" count="16" type="stmt"/>
-        <line num="165" count="15" type="stmt"/>
-      </file>
-    </package>
-    <package name="src.commands.roster">
-      <metrics statements="37" coveredstatements="31" conditionals="8" coveredconditionals="3" methods="11" coveredmethods="11"/>
-      <file name="add-alt.ts" path="/home/alexmk92/code/bnc-attendance/src/commands/roster/add-alt.ts">
-        <metrics statements="21" coveredstatements="19" conditionals="2" coveredconditionals="1" methods="8" coveredmethods="8"/>
-        <line num="9" count="2" type="stmt"/>
-        <line num="10" count="2" type="stmt"/>
-        <line num="12" count="2" type="stmt"/>
-        <line num="14" count="2" type="stmt"/>
-        <line num="15" count="2" type="stmt"/>
-        <line num="16" count="2" type="stmt"/>
-        <line num="17" count="2" type="stmt"/>
-        <line num="23" count="6" type="stmt"/>
-        <line num="25" count="6" type="stmt"/>
-        <line num="27" count="2" type="cond" truecount="1" falsecount="1"/>
-        <line num="28" count="0" type="stmt"/>
-        <line num="33" count="2" type="stmt"/>
-        <line num="38" count="2" type="stmt"/>
-        <line num="40" count="2" type="stmt"/>
-        <line num="43" count="6" type="stmt"/>
-        <line num="45" count="4" type="stmt"/>
-        <line num="50" count="2" type="stmt"/>
-        <line num="53" count="0" type="stmt"/>
-        <line num="55" count="2" type="stmt"/>
-        <line num="58" count="2" type="stmt"/>
-        <line num="59" count="4" type="stmt"/>
-      </file>
-      <file name="add.ts" path="/home/alexmk92/code/bnc-attendance/src/commands/roster/add.ts">
-        <metrics statements="8" coveredstatements="7" conditionals="2" coveredconditionals="1" methods="2" coveredmethods="2"/>
-        <line num="5" count="8" type="stmt"/>
-        <line num="6" count="8" type="stmt"/>
-        <line num="7" count="12" type="cond" truecount="1" falsecount="1"/>
-        <line num="8" count="0" type="stmt"/>
-        <line num="10" count="12" type="stmt"/>
-        <line num="16" count="8" type="stmt"/>
-        <line num="23" count="8" type="stmt"/>
-        <line num="24" count="8" type="stmt"/>
-      </file>
-      <file name="fetch.ts" path="/home/alexmk92/code/bnc-attendance/src/commands/roster/fetch.ts">
-        <metrics statements="8" coveredstatements="5" conditionals="4" coveredconditionals="1" methods="1" coveredmethods="1"/>
-        <line num="7" count="4" type="stmt"/>
-        <line num="8" count="4" type="stmt"/>
-        <line num="9" count="4" type="cond" truecount="1" falsecount="1"/>
-        <line num="10" count="4" type="stmt"/>
-        <line num="12" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="13" count="0" type="stmt"/>
-        <line num="15" count="0" type="stmt"/>
-        <line num="24" count="4" type="stmt"/>
+        <line num="55" count="5" type="stmt"/>
+        <line num="56" count="5" type="stmt"/>
+        <line num="66" count="5" type="stmt"/>
+        <line num="68" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="69" count="2" type="stmt"/>
+        <line num="72" count="3" type="stmt"/>
+        <line num="75" count="1" type="stmt"/>
+        <line num="79" count="5" type="stmt"/>
+        <line num="80" count="5" type="stmt"/>
+        <line num="82" count="5" type="stmt"/>
+        <line num="85" count="5" type="stmt"/>
+        <line num="88" count="5" type="stmt"/>
+        <line num="90" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="102" count="5" type="cond" truecount="4" falsecount="0"/>
+        <line num="106" count="5" type="stmt"/>
+        <line num="133" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="134" count="1" type="stmt"/>
+        <line num="137" count="4" type="cond" truecount="1" falsecount="1"/>
+        <line num="149" count="1" type="stmt"/>
+        <line num="150" count="5" type="stmt"/>
+        <line num="151" count="5" type="stmt"/>
+        <line num="156" count="5" type="stmt"/>
+        <line num="157" count="5" type="stmt"/>
+        <line num="158" count="5" type="cond" truecount="1" falsecount="1"/>
+        <line num="159" count="5" type="stmt"/>
+        <line num="163" count="5" type="stmt"/>
       </file>
     </package>
     <package name="src.util">
-      <metrics statements="17" coveredstatements="8" conditionals="10" coveredconditionals="2" methods="3" coveredmethods="1"/>
+      <metrics statements="5" coveredstatements="5" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
       <file name="db.ts" path="/home/alexmk92/code/bnc-attendance/src/util/db.ts">
         <metrics statements="5" coveredstatements="5" conditionals="2" coveredconditionals="2" methods="1" coveredmethods="1"/>
-        <line num="4" count="5" type="stmt"/>
-        <line num="6" count="5" type="stmt"/>
-        <line num="7" count="96" type="cond" truecount="2" falsecount="0"/>
-        <line num="8" count="5" type="stmt"/>
-        <line num="19" count="96" type="stmt"/>
-      </file>
-      <file name="googleApi.ts" path="/home/alexmk92/code/bnc-attendance/src/util/googleApi.ts">
-        <metrics statements="12" coveredstatements="3" conditionals="8" coveredconditionals="0" methods="2" coveredmethods="0"/>
-        <line num="9" count="1" type="stmt"/>
-        <line num="13" count="1" type="stmt"/>
-        <line num="14" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="15" count="0" type="stmt"/>
-        <line num="30" count="0" type="stmt"/>
-        <line num="36" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="37" count="0" type="stmt"/>
-        <line num="47" count="1" type="stmt"/>
-        <line num="48" count="0" type="stmt"/>
-        <line num="50" count="0" type="cond" truecount="0" falsecount="4"/>
-        <line num="51" count="0" type="stmt"/>
-        <line num="54" count="0" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="22" type="cond" truecount="2" falsecount="0"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="19" count="22" type="stmt"/>
       </file>
     </package>
   </project>
