@@ -98,21 +98,31 @@ const allTime = async (
     .select(
       knex.raw(
         `
-        if (pa.alt_id = pr.player_id, a.name, p.name) AS player_name,
-        if (pa.alt_id = pr.player_id, pa.player_id, pr.player_id) AS player_id,
-        pr.player_id,
+        p.name AS player_name,
+        p.id AS player_id,
         round((cast(count(distinct pr.raid_id + pr.raid_hour) as decimal) / cast(count(distinct all_raids.raid_id + all_raids.raid_hour) as decimal) * 100), 2) AS attendance
         `
       )
     )
-    .from(knex.raw('player_raid AS pr'))
+    .from(
+      knex.raw(`
+        (
+          select
+            distinct if (pa.alt_id = pr.player_id, pa.player_id, pr.player_id) AS player_id,
+            pr.raid_id,
+            pr.raid_hour,
+            pr.created_at
+          from player_raid pr
+            left join player_alt pa on pa.alt_id = pr.player_id
+            left join player a on pa.player_id = a.id
+        ) pr
+    `)
+    )
     .innerJoin(
       knex.raw('player_raid AS all_raids ON all_raids.raid_id IS NOT NULL')
     )
     .leftJoin(knex.raw('player AS p ON pr.player_id = p.id'))
-    .leftJoin(knex.raw('player_alt pa ON pa.alt_id = pr.player_id'))
-    .leftJoin(knex.raw('player a ON pa.player_id = a.id'))
-    .groupBy(knex.raw('pr.player_id, p.name, pa.alt_id, pa.player_id, a.name'));
+    .groupBy(knex.raw('pr.player_id, p.name, p.id'));
 
   rows.forEach((row: AttendanceDatum) => {
     if (aggregatedRows?.[row?.player_id]) {
@@ -123,6 +133,8 @@ const allTime = async (
       row.attendance = parseFloat(`${row.attendance}`);
       aggregatedRows[row.player_id] = row;
     }
+
+    aggregatedRows[row.player_id].attendance = Math.min(100, row.attendance);
   });
 
   return Object.values(aggregatedRows);
@@ -137,25 +149,36 @@ const daysInRange = async (
     .select(
       knex.raw(
         `
-        if (pa.alt_id = pr.player_id, a.name, p.name) AS player_name,
-        if (pa.alt_id = pr.player_id, pa.player_id, pr.player_id) AS player_id,
+        p.name AS player_name,
+        p.id AS player_id,
         round((cast(count(distinct pr.raid_id + pr.raid_hour) as decimal) / cast(count(distinct all_raids.raid_id + all_raids.raid_hour) as decimal) * 100), 2) AS attendance
         `
       )
     )
-    .from(knex.raw('player_raid AS pr'))
+    .from(
+      knex.raw(`
+        (
+          select
+            distinct if (pa.alt_id = pr.player_id, pa.player_id, pr.player_id) AS player_id,
+            pr.raid_id,
+            pr.raid_hour,
+            pr.created_at
+          from player_raid pr
+            left join player_alt pa on pa.alt_id = pr.player_id
+            left join player a on pa.player_id = a.id
+        ) pr
+    `)
+    )
     .innerJoin(
       knex.raw(
         `player_raid AS all_raids ON all_raids.raid_id IS NOT NULL AND all_raids.created_at > current_timestamp - interval '${days}' day`
       )
     )
     .leftJoin(knex.raw('player AS p ON pr.player_id = p.id'))
-    .leftJoin(knex.raw('player_alt pa ON pa.alt_id = pr.player_id'))
-    .leftJoin(knex.raw('player a ON pa.player_id = a.id'))
     .where(
       knex.raw(`pr.created_at > current_timestamp - interval '${days}' day`)
     )
-    .groupBy(knex.raw('pr.player_id, p.name, pa.alt_id, pa.player_id, a.name'));
+    .groupBy(knex.raw('pr.player_id, p.name, p.id'));
 
   rows.forEach((row: AttendanceDatum) => {
     if (aggregatedRows?.[row?.player_id]) {
@@ -166,6 +189,8 @@ const daysInRange = async (
       row.attendance = parseFloat(`${row.attendance}`);
       aggregatedRows[row.player_id] = row;
     }
+
+    aggregatedRows[row.player_id].attendance = Math.min(100, row.attendance);
   });
 
   return Object.values(aggregatedRows);
