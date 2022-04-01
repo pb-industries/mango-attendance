@@ -85,6 +85,11 @@ app.get('/raid', async (req, res) => {
   res.send(raids);
 });
 
+app.get('/raid/calculate-attendance', async (_, res) => {
+  await calculateAttendance();
+  res.send({ message: 'Recorded attendance' });
+});
+
 // RAFFLE endpoints
 app.get('/raffle/tickets', async (req, res) => {
   let { raffle_id, player_ids } = req.body;
