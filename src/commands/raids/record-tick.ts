@@ -11,19 +11,26 @@ export default async (
   tickTime?: number,
   finalTick?: boolean
 ) => {
+  console.log('TICK TIME IS: ', tickTime);
   const tickDate = new Date(
     new Date(tickTime ?? new Date().getTime()).toUTCString()
-  ).toISOString();
+  );
   const knex = await getConnection();
   const raid = await knex.from('raid').where('id', raidId).first();
   if (!raid) {
     throw new Error(`Raid ${raidId} not found`);
   }
 
-  let currentTick = await getCurrentTick(raidId, tickTime);
   const attendeeMetadata = await fetchPlayers(playerNames);
 
-  if (finalTick) {
+  let currentTick: number = 0;
+  const previousTick = await getPreviousTick(raidId);
+  if (previousTick) {
+    currentTick = getNextTick(previousTick, tickDate);
+  }
+
+  // Only allow a final tick if we have the early tick and a tick
+  if (finalTick && currentTick >= 1) {
     currentTick += 1;
   }
 
@@ -33,8 +40,8 @@ export default async (
       player_id: id,
       // Tick 0 is our ontime tick =)
       raid_hour: currentTick,
-      created_at: tickDate,
-      updated_at: tickDate,
+      created_at: tickDate.toISOString(),
+      updated_at: tickDate.toISOString(),
     };
   });
 
@@ -51,90 +58,52 @@ export default async (
   return { playersRecorded: playersToRecord.length, tick: currentTick };
 };
 
-const getPreviousTickTime = async (raidId: string): Promise<Tick | null> => {
-  const knex = await getConnection();
-  const res = (await knex
-    .select([
-      knex.raw('raid_hour as last_tick, created_at as previous_tick_time'),
-    ])
-    .from('player_raid')
-    .where('raid_id', raidId)
-    .orderBy('raid_hour', 'desc')
-    .groupBy(['raid_id', 'raid_hour', 'created_at'])
-    .having('raid_hour', '>', 0)) as unknown as Tick[];
+const getNextTick = (tick: Tick, nextTickDate: Date): number => {
+  // If this within the first tick window
+  const { last_tick: lastTick, previous_tick_time: previousTickTime } = tick;
 
-  const prevTick = res.shift();
+  const lastTickDate = new Date(previousTickTime * 1000);
+  const diffInMs = Math.abs(nextTickDate.getTime() - lastTickDate.getTime());
+  const diffInMinutes = Math.floor(diffInMs / 1000 / 60);
+
+  if (lastTick === 0 && diffInMinutes > 10) {
+    return lastTick + 1;
+  }
+
+  const minutesPastHour = lastTickDate.getMinutes();
+  const minutesUntilNextHour = 60 - minutesPastHour;
+  if (diffInMinutes > minutesUntilNextHour && diffInMinutes > 26) {
+    return lastTick + 1;
+  }
+
+  return lastTick;
+};
+
+const getPreviousTick = async (raidId: string): Promise<Tick | null> => {
+  const knex = await getConnection();
+  const prevTick = (
+    await knex
+      .select([
+        knex.raw(`
+          raid_hour::int as last_tick,
+          min(created_at)::int as previous_tick_time
+        `),
+      ])
+      .from('player_raid')
+      .where('raid_id', raidId)
+      .orderBy('raid_hour', 'desc')
+      .groupBy(['raid_hour'])
+      .limit(1)
+  )?.[0] as unknown as Tick | null;
 
   if (!prevTick) {
     return null;
   }
 
-  return prevTick;
-};
-
-const getCurrentTick = async (
-  raidId: string,
-  nextTickTime?: number
-): Promise<number> => {
-  const previousTickMeta = await getPreviousTickTime(raidId);
-  const knex = await getConnection();
-
-  const nextTick = new Date(
-    new Date(nextTickTime ?? new Date().getTime())
-  ).toISOString();
-  const prevTick = new Date(
-    new Date(previousTickMeta?.previous_tick_time ?? new Date().getTime())
-  ).toISOString();
-  console.log(nextTick, prevTick);
-
-  const previousTickClause = previousTickMeta
-    ? `
-    if (
-      -- If another 26 minutes have elapsed since the previous tick, then allow us to record it
-      extract(epoch from ('${nextTick}'::TIMESTAMP - '${prevTick}'::TIMESTAMP) / 60) >= 26,
-      max(raid_hour) + 1,
-      max(raid_hour)
-    )
-  `
-    : 'max(raid_hour)';
-
-  const lastTickDelta =
-    previousTickMeta === null || previousTickMeta.last_tick === 0
-      ? `(now() - max(created_at))`
-      : `(max(created_at) -  min(created_at))`;
-
-  const res = await knex
-    .select([
-      knex.raw(
-        `
-          ((cast(extract('epoch' from ${lastTickDelta}) as int) + 60) % 60) / 60 AS time_passed,
-          ((cast(extract('epoch' from ${lastTickDelta}) as int) + 60) % 60) / 60 > 0.43 AS next_tick_done,
-      if(
-        coalesce(max(raid_hour), 0) = 0,
-        -- If the max minutes elapsed at tick 1 < 10 then count more early tickers
-        -- else roll this over to tick 1.
-        if (extract(epoch from ('${nextTick}'::TIMESTAMP - min(created_at)) / 60) < 10, 0, 1),
-        -- If the amount of minutes elapsed * latest tick > 60
-        if (
-          -- Work out what proportion of an hour has passed since the last tick, 0.43 = ~26 mins, if
-          -- so we use the next tick, otherwise we take the current tick
-          (cast(extract(epoch from ${lastTickDelta}) / 60 as int) % 60) / 60 > 0.43,
-          ${previousTickClause},
-          max(raid_hour)
-        )
-      ) AS current_tick
-    `
-      ),
-    ])
-    .from('player_raid')
-    .where('raid_id', raidId)
-    .groupBy('raid_id');
-
-  if (!res?.[0]) {
-    return 0;
-  }
-
-  return parseInt(`${res[0].current_tick ?? 0}`);
+  return {
+    previous_tick_time: parseInt(`${prevTick.previous_tick_time}`),
+    last_tick: parseInt(`${prevTick.last_tick}`),
+  };
 };
 
 /**

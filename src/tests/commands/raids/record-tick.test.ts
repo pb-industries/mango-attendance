@@ -14,8 +14,8 @@ const addMinutesToDate = (minutes: number) =>
   );
 
 const firstTickTime = addMinutesToDate(30);
-const secondTickTime = addMinutesToDate(60);
-const thirdTickTime = addMinutesToDate(120);
+const secondTickTime = addMinutesToDate(87);
+const thirdTickTime = addMinutesToDate(147);
 
 beforeEach(async () => {
   raid = await addRaid('Mistmoore', 5);
@@ -106,7 +106,6 @@ it(`will calculate the last 30, 60, 90 days of attendance for each player`, asyn
     { name: 'nerduun', class: 'warrior', level: 65 },
   ]);
 
-  const raid = await addRaid('Citadel of Anguish', 11);
   await recordTick(raid.id, ['tankpotato']);
   await recordTick(raid.id, ['tankpotato'], firstTickTime.getTime());
   await recordTick(

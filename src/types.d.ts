@@ -85,6 +85,6 @@ interface CacheConfig {
 }
 
 interface Tick {
-  previous_tick_time: string;
+  previous_tick_time: number;
   last_tick: number;
 }
