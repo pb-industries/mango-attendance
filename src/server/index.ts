@@ -17,6 +17,7 @@ import addAlt from '@/commands/roster/add-alt';
 import addPlayer from '@/commands/roster/add';
 import addRaffle from '@/commands/raffle/add';
 import fetchRaffleRolls from '@/commands/raffle/fetch-roll';
+import recordLoot from '@/commands/loot/record';
 import { __port__ } from '@/constants';
 import { log } from '@/logger';
 import cors from 'cors';
@@ -113,13 +114,27 @@ app.post('/raffle', async (req, res) => {
   }
 });
 
-app.post('/raffle/{raffleId}', (req, res) => {
-  const { raffle_id } = req.query;
-  if (!raffle_id) {
+app.post('/raffle/:raffleId}', (req, res) => {
+  const { raffleId } = req.query;
+  if (!raffleId) {
     res.status(400).send('Missing raffle id');
   } else {
     // TODO implement setting the winner
-    res.status(200).send({ data: { raffle_id: raffle_id } });
+    res.status(200).send({ data: { raffle_id: raffleId } });
+  }
+});
+
+app.post('/raid/:raidId/loot', async (req, res) => {
+  const { raidId } = req.params;
+  const { lootLines } = req.body as {
+    lootLines: { playerName: string; itemName: string }[];
+  };
+  console.log(raidId);
+  if (typeof raidId !== 'string' || !lootLines) {
+    res.status(400).send('Missing raid id or loot lines');
+  } else {
+    const loot_recorded = await recordLoot(raidId, lootLines);
+    res.status(200).send({ data: { loot_recorded } });
   }
 });
 
