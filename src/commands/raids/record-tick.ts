@@ -72,7 +72,7 @@ const getNextTick = (tick: Tick, nextTickDate: Date): number => {
 
   const minutesPastHour = lastTickDate.getMinutes();
   const minutesUntilNextHour = 60 - minutesPastHour;
-  if (diffInMinutes > minutesUntilNextHour && diffInMinutes > 26) {
+  if (diffInMinutes > minutesUntilNextHour && diffInMinutes > 35) {
     return lastTick + 1;
   }
 

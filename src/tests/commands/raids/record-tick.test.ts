@@ -14,8 +14,8 @@ const addMinutesToDate = (minutes: number) =>
   );
 
 const firstTickTime = addMinutesToDate(30);
-const secondTickTime = addMinutesToDate(87);
-const thirdTickTime = addMinutesToDate(147);
+const secondTickTime = addMinutesToDate(67);
+const thirdTickTime = addMinutesToDate(127);
 
 beforeEach(async () => {
   raid = await addRaid('Mistmoore', 5);
