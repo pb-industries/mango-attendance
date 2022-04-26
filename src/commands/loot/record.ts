@@ -3,6 +3,7 @@ import { getConnection } from '@/util/db';
 type LootLine = {
   playerName: string;
   itemName: string;
+  quantity?: number;
 };
 
 export default async (raidId: string | bigint, lootLines: LootLine[]) => {
@@ -35,16 +36,21 @@ export default async (raidId: string | bigint, lootLines: LootLine[]) => {
 
   const linesToInsert = lootLines
     .map((lootLine) => {
-      const { playerName, itemName } = lootLine;
+      const { playerName, itemName, quantity } = lootLine;
       const playerId = playerNameIdMap[playerName.toLowerCase()];
       const itemId = itemNameIdMap[itemName.toLowerCase()];
       if (!playerId) {
         return null;
       }
+      const date = new Date();
+      date.setMilliseconds(0);
+      date.setSeconds(0);
+
       return {
         looted_by_id: BigInt(playerId),
         item_id: BigInt(itemId),
         raid_id: BigInt(raidId),
+        quantity: BigInt(quantity ?? 1),
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
