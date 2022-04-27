@@ -127,7 +127,12 @@ app.post('/raffle/:raffleId}', (req, res) => {
 app.post('/raid/:raidId/loot', async (req, res) => {
   const { raidId } = req.params;
   const { lootLines } = req.body as {
-    lootLines: { playerName: string; itemName: string; quantity?: number }[];
+    lootLines: {
+      playerName: string;
+      itemName: string;
+      quantity?: number;
+      lootedFrom?: string;
+    }[];
   };
   if (typeof raidId !== 'string' || !lootLines) {
     res.status(400).send('Missing raid id or loot lines');
