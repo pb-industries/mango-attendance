@@ -9,12 +9,14 @@ type LootLine = {
 
 export default async (raidId: string | bigint, lootLines: LootLine[]) => {
   const knex = await getConnection();
-  const playerNames = lootLines.map(({ playerName }) =>
-    playerName.toLowerCase().trim()
-  );
-  const itemNames = lootLines.map(({ itemName }) => {
-    return itemName.toLowerCase().trim();
-  });
+  const playerNames = lootLines
+    .map(({ playerName }) => playerName?.toLowerCase().trim())
+    .filter((p) => !!p);
+  const itemNames = lootLines
+    .map(({ itemName }) => {
+      return itemName?.toLowerCase().trim();
+    })
+    .filter((i) => !!i);
   const itemIds = await knex
     .select(['id', 'name'])
     .from('item')
@@ -38,8 +40,8 @@ export default async (raidId: string | bigint, lootLines: LootLine[]) => {
   const linesToInsert = lootLines
     .map((lootLine) => {
       const { playerName, itemName, quantity, lootedFrom } = lootLine;
-      const playerId = playerNameIdMap[playerName.toLowerCase()];
-      const itemId = itemNameIdMap[itemName.toLowerCase()];
+      const playerId = playerNameIdMap[playerName?.toLowerCase()];
+      const itemId = itemNameIdMap[itemName?.toLowerCase()];
       if (!playerId) {
         return null;
       }
