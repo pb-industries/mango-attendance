@@ -25,7 +25,6 @@ export default async () => {
     { name: 'attendance_60', data: await daysInRange(knex, 60) },
     { name: 'attendance_90', data: await daysInRange(knex, 90) },
   ];
-  console.log(attendanceData[1]?.data);
 
   attendanceData.forEach(({ name, data }) => {
     data.forEach(({ player_id, player_name, attendance }) => {
@@ -131,8 +130,8 @@ const daysInRange = async (
     .select(
       knex.raw(
         `
-        p.name AS player_name,
         p.id AS player_id,
+        p.name AS player_name,
         round((cast(count(distinct pr.raid_id + pr.raid_hour) as decimal) / cast(count(distinct all_raids.raid_id + all_raids.raid_hour) as decimal) * 100), 2) AS attendance
         `
       )
