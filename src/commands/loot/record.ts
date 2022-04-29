@@ -5,6 +5,7 @@ type LootLine = {
   itemName: string;
   quantity?: number;
   lootedFrom?: string;
+  wasAssigned: boolean;
 };
 
 export default async (raidId: string | bigint, lootLines: LootLine[]) => {
@@ -39,7 +40,8 @@ export default async (raidId: string | bigint, lootLines: LootLine[]) => {
 
   const linesToInsert = lootLines
     .map((lootLine) => {
-      const { playerName, itemName, quantity, lootedFrom } = lootLine;
+      const { playerName, itemName, quantity, lootedFrom, wasAssigned } =
+        lootLine;
       const playerId = playerNameIdMap[playerName?.toLowerCase()];
       const itemId = itemNameIdMap[itemName?.toLowerCase()];
       if (!playerId) {
@@ -55,6 +57,7 @@ export default async (raidId: string | bigint, lootLines: LootLine[]) => {
         raid_id: BigInt(raidId),
         quantity: BigInt(quantity ?? 1),
         looted_from: lootedFrom || null,
+        was_assigned: wasAssigned || false,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
