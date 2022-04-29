@@ -132,6 +132,7 @@ app.post('/raid/:raidId/loot', async (req, res) => {
       itemName: string;
       quantity?: number;
       lootedFrom?: string;
+      wasAssigned: boolean;
     }[];
   };
   if (typeof raidId !== 'string' || !lootLines) {

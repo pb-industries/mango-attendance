@@ -57,7 +57,7 @@ export default async (raidId: string | bigint, lootLines: LootLine[]) => {
         raid_id: BigInt(raidId),
         quantity: BigInt(quantity ?? 1),
         looted_from: lootedFrom || null,
-        was_assigned: wasAssigned || false,
+        was_assigned: !!parseInt(`${wasAssigned ?? '1'}`, 10) || false,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
