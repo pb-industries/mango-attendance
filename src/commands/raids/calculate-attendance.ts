@@ -1,7 +1,6 @@
 import { Knex } from 'knex';
 import { log } from '@/logger';
 import { getConnection } from '@/util/db';
-import { getSheets } from '@/util/googleApi';
 
 type Attendance =
   | 'attendance_life'
@@ -48,19 +47,10 @@ export default async () => {
   });
 
   knex.transaction(async (trx) => {
-    const sheetRows: (string | number)[][] = [];
     const updates = Object.values(playerAttendance).map((attendance) => {
-      const { player_id, player_name } = attendance;
+      const { player_id } = attendance;
       delete attendance.player_id;
       delete attendance.player_name;
-
-      sheetRows.push([
-        player_name,
-        attendance.attendance_30,
-        attendance.attendance_60,
-        attendance.attendance_90,
-        attendance.attendance_life,
-      ]);
 
       return trx('player')
         .update(attendance)
@@ -68,18 +58,10 @@ export default async () => {
         .transacting(trx);
     });
 
-    // In order to emulate replacing the whole sheet, insert a bunch of blank
-    // cells incase members are ever removed
-    const blankRows = 50;
-    for (let j = blankRows; j > 0; j--) {
-      sheetRows.push(['', '', '', '', '']);
-    }
-
     try {
       await Promise.all(updates);
       await trx.commit();
       log.info(`Successfully updated attendance of all members.`);
-      await updateSheet(sheetRows);
     } catch (e) {
       log.error(e);
       log.error('unexpected error when saving attendance');
@@ -178,7 +160,7 @@ const daysInRange = async (
     .where(
       knex.raw(`pr.created_at > current_timestamp - interval '${days}' day`)
     )
-    .groupBy(knex.raw('pr.player_id, p.name, p.id'));
+    .groupBy(knex.raw('pr.player_id, p.id'));
 
   rows.forEach((row: AttendanceDatum) => {
     if (aggregatedRows?.[row?.player_id]) {
@@ -194,34 +176,4 @@ const daysInRange = async (
   });
 
   return Object.values(aggregatedRows);
-};
-
-const updateSheet = async (playerAttendance: (string | number)[][]) => {
-  if (process.env.NODE_ENV === 'test') {
-    return false;
-  }
-
-  const spreadsheetId = process.env.GOOGLE_SHEET_ID;
-  const range = 'Attendance!A2:E';
-
-  const sheets = await getSheets();
-  return sheets.spreadsheets.values.update(
-    {
-      spreadsheetId,
-      range,
-      valueInputOption: 'USER_ENTERED',
-      // @ts-ignore
-      resource: {
-        values: playerAttendance,
-      },
-    },
-    (err: any) => {
-      if (err) {
-        log.error(`The API returned an error: ${err}`);
-        return;
-      } else {
-        log.info(`Successfully updated attendance spreadsheet.`);
-      }
-    }
-  );
 };
