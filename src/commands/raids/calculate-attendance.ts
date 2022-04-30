@@ -59,6 +59,7 @@ export default async () => {
 
     try {
       await Promise.all(updates);
+      await calculateTickets();
       await trx.commit();
       log.info(`Successfully updated attendance of all members.`);
     } catch (e) {
@@ -66,6 +67,44 @@ export default async () => {
       log.error('unexpected error when saving attendance');
       await trx.rollback();
       throw e;
+    }
+  });
+};
+
+const calculateTickets = async (): Promise<void> => {
+  const knex = await getConnection();
+  //   select
+  // from player AS pl
+  // left join player_alt AS pa on pa.player_id = pl.id
+  // group by pl.id
+  // having count(pa.player_id) > 0
+  const rows = await knex
+    .select(
+      knex.raw(
+        `
+          pl.id,
+          pl.name,
+          round(
+            -- Attendance
+            pl.attendance_30::float *
+            -- Box modifier express as 10 + boxes / 10 to get decimal of 1.X
+            ((10 + greatest(0, count(pa.player_id))) / 10)::float
+            -- Add loot modifier here when we have it!
+          ) AS total_tickets
+        `
+      )
+    )
+    .from(`player AS pl`)
+    .leftJoin(knex.raw('left join player_alt AS pa on pa.player_id = pl.id'))
+    .groupBy(knex.raw('pl.id'));
+
+  rows.forEach((row: any) => {
+    if (row?.id) {
+      knex('player')
+        .update({
+          total_tickets: row.total_tickets,
+        })
+        .where({ id: row.id });
     }
   });
 };
