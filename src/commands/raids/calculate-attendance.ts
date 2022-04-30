@@ -59,7 +59,6 @@ export default async () => {
 
     try {
       await Promise.all(updates);
-      await calculateTickets();
       await trx.commit();
       log.info(`Successfully updated attendance of all members.`);
     } catch (e) {
@@ -69,11 +68,12 @@ export default async () => {
       throw e;
     }
   });
+
+  await calculateTickets();
 };
 
 const calculateTickets = async (): Promise<void> => {
   const knex = await getConnection();
-  // TODO: Commit in transaction
   const rows = await knex
     .select(
       knex.raw(
@@ -91,16 +91,34 @@ const calculateTickets = async (): Promise<void> => {
       )
     )
     .from(`player AS pl`)
-    .leftJoin(knex.raw('left join player_alt AS pa on pa.player_id = pl.id'))
+    .leftJoin(knex.raw('player_alt AS pa on pa.player_id = pl.id'))
     .groupBy(knex.raw('pl.id'));
 
-  rows.forEach((row: any) => {
-    if (row?.id) {
-      knex('player')
-        .update({
-          total_tickets: row.total_tickets,
-        })
-        .where({ id: row.id });
+  knex.transaction(async (trx) => {
+    const updates: any[] = rows
+      .map((row: any) => {
+        if (row?.id) {
+          return knex('player')
+            .update({
+              total_tickets: row.total_tickets,
+            })
+            .where({ id: row.id })
+            .transacting(trx);
+        } else {
+          return null;
+        }
+      })
+      .filter((u: any) => u !== null);
+
+    try {
+      await Promise.all(updates);
+      await trx.commit();
+      log.info(`Successfully updated tickets of all members.`);
+    } catch (e) {
+      log.error(e);
+      log.error('Unexpected error saving tickets');
+      await trx.rollback();
+      throw e;
     }
   });
 };
