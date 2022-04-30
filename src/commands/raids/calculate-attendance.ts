@@ -73,11 +73,7 @@ export default async () => {
 
 const calculateTickets = async (): Promise<void> => {
   const knex = await getConnection();
-  //   select
-  // from player AS pl
-  // left join player_alt AS pa on pa.player_id = pl.id
-  // group by pl.id
-  // having count(pa.player_id) > 0
+  // TODO: Commit in transaction
   const rows = await knex
     .select(
       knex.raw(
