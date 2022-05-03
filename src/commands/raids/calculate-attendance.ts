@@ -173,7 +173,7 @@ const calculateTickets = async (): Promise<void> => {
           pl.name,
           round(
             -- Attendance
-            pl.attendance_30::float *
+            pl.attendance_60::float *
             -- Box modifier (set on guild default 10%)
             ((max(greatest(0, bi.total_boxes::float)) * max(g.box_modifier)) + 1) *
             -- Loot modifier (set on guild, default 3%)
