@@ -189,8 +189,9 @@ const calculateTickets = async (): Promise<void> => {
         select
           pa.player_id,
           count(*) AS total_boxes
-        from player_alt pa
-        inner join player as pl on pa.player_id = pl.id and pl.rank = 'raider'
+        from player AS pl
+        inner join player_alt as pa on pa.alt_id = pl.id
+        where pl.rank = 'raider'
         group by pa.player_id
       ) as bi on bi.player_id = pl.id
     `)
