@@ -1,7 +1,7 @@
 module.exports = {
   up: async function (knex) {
     return knex.schema.alterTable('player', (table) => {
-      table.string('rank').default('alt');
+      table.string('rank').default('raider');
       table
         .integer('guild_id')
         .references('id')
