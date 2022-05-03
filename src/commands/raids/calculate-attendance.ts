@@ -15,6 +15,12 @@ interface AttendanceDatum {
 }
 
 export default async () => {
+  await calculateAttendance();
+  await calculateTicksSinceLastWin();
+  await calculateTickets();
+};
+
+const calculateAttendance = async (): Promise<void> => {
   const knex = await getConnection();
   const playerAttendance: {
     [key: number]: { [key: string]: number | string };
@@ -45,7 +51,7 @@ export default async () => {
     });
   });
 
-  knex.transaction(async (trx) => {
+  await knex.transaction(async (trx) => {
     const updates = Object.values(playerAttendance).map((attendance) => {
       const { player_id } = attendance;
       delete attendance.player_id;
@@ -68,8 +74,95 @@ export default async () => {
       throw e;
     }
   });
+};
 
-  await calculateTickets();
+const calculateTicksSinceLastWin = async (): Promise<void> => {
+  const knex = await getConnection();
+  const { rows } = (await knex.raw(`
+    select
+      ap.id AS player_id,
+      if(ap.id = pa.alt_id, pa.player_id, ap.id) AS main_id,
+      count(distinct concat(r.id::string, pr.raid_hour::string)) AS ticks_since_last_win,
+      if(if(ap.id = pa.alt_id, pa.player_id, ap.id) = ap.id, 1, 0) AS is_main
+    from (
+      select
+      pl.id,
+      pl.name,
+      COALESCE(MAX(lw.time_last_won), '2022-05-01 00:00:00+00') AS last_won_time
+      from player AS pl
+      left join (
+          select
+              if(pl.id = pa.alt_id, pa.player_id, pl.id) AS player_id,
+              MAX(GREATEST(lh.created_at)) AS time_last_won
+          from player AS pl
+          inner join loot_history lh on lh.looted_by_id = pl.id
+          inner join item i on lh.item_id = i.id and i.category = 'bis'
+          left join player_alt pa on pa.alt_id = pl.id
+          group by pl.id, pa.alt_id, player_id
+      ) lw on lw.player_id = pl.id
+      left join guild g on pl.guild_id = g.id
+      group by pl.id, pl.name
+    ) AS ap
+    left join raid as r on r.created_at >= ap.last_won_time
+    left join player_raid pr on pr.raid_id = r.id and pr.player_id = ap.id
+    left join player_alt as pa on pa.alt_id = ap.id
+    group by pa.alt_id, pa.player_id, ap.id, ap.name
+    order by is_main desc
+  `)) as {
+    rows: {
+      main_id: string;
+      player_id: string;
+      ticks_since_last_win: number;
+    }[];
+  };
+
+  if (!rows) {
+    console.error('No rows found when calculating tickets');
+    return;
+  }
+
+  const ticksSinceLastWin = rows.reduce(
+    (
+      acc: { [playerId: string]: number },
+      { player_id, main_id, ticks_since_last_win }
+    ) => {
+      if (player_id === main_id) {
+        acc[player_id] = parseInt(`${ticks_since_last_win}`, 10);
+      } else {
+        acc[player_id] = acc?.[main_id] ?? 0;
+      }
+      return acc;
+    },
+    {}
+  );
+
+  await knex.transaction(async (trx) => {
+    const updates: any[] = Object.keys(ticksSinceLastWin)
+      .map((playerId) => {
+        if (playerId) {
+          return knex('player')
+            .update({
+              ticks_since_last_win: ticksSinceLastWin?.[playerId] ?? 0,
+            })
+            .where({ id: BigInt(playerId) })
+            .transacting(trx);
+        } else {
+          return null;
+        }
+      })
+      .filter((u: any) => u !== null);
+
+    try {
+      await Promise.all(updates);
+      await trx.commit();
+      log.info(`Successfully recorded ticks since last win`);
+    } catch (e) {
+      log.error(e);
+      log.error('Unexpected error saving ticks');
+      await trx.rollback();
+      throw e;
+    }
+  });
 };
 
 const calculateTickets = async (): Promise<void> => {
@@ -84,7 +177,7 @@ const calculateTickets = async (): Promise<void> => {
             -- Attendance
             pl.attendance_30::float *
             -- Box modifier express as 10 + boxes / 10 to get decimal of 1.X
-            ((10 + greatest(0, count(pa.player_id))) / 10)::float
+            ((10 + greatest(0, sum(if(alt.rank = 'raider', 1, 0)))) / 10)::float
             -- Add loot modifier here when we have it!
           ) AS total_tickets
         `
@@ -92,9 +185,10 @@ const calculateTickets = async (): Promise<void> => {
     )
     .from(`player AS pl`)
     .leftJoin(knex.raw('player_alt AS pa on pa.player_id = pl.id'))
+    .innerJoin(knex.raw('player AS alt ON pa.alt_id = alt.id'))
     .groupBy(knex.raw('pl.id'));
 
-  knex.transaction(async (trx) => {
+  await knex.transaction(async (trx) => {
     const updates: any[] = rows
       .map((row: any) => {
         if (row?.id) {
