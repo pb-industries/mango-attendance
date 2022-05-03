@@ -51,29 +51,27 @@ const calculateAttendance = async (): Promise<void> => {
     });
   });
 
-  await knex.transaction(async (trx) => {
-    const updates = Object.values(playerAttendance).map((attendance) => {
-      const { player_id } = attendance;
-      delete attendance.player_id;
-      delete attendance.player_name;
+  // await knex.transaction(async (trx) => {
+  const updates = Object.values(playerAttendance).map((attendance) => {
+    const { player_id } = attendance;
+    delete attendance.player_id;
+    delete attendance.player_name;
 
-      return trx('player')
-        .update(attendance)
-        .where({ id: player_id })
-        .transacting(trx);
-    });
-
-    try {
-      await Promise.all(updates);
-      await trx.commit();
-      log.info(`Successfully updated attendance of all members.`);
-    } catch (e) {
-      log.error(e);
-      log.error('unexpected error when saving attendance');
-      await trx.rollback();
-      throw e;
-    }
+    return knex('player').update(attendance).where({ id: player_id });
+    // .transacting(trx);
   });
+
+  try {
+    await Promise.all(updates);
+    // await trx.commit();
+    log.info(`Successfully updated attendance of all members.`);
+  } catch (e) {
+    log.error(e);
+    log.error('unexpected error when saving attendance');
+    // await trx.rollback();
+    throw e;
+  }
+  // });
 };
 
 const calculateTicksSinceLastWin = async (): Promise<void> => {
@@ -136,33 +134,33 @@ const calculateTicksSinceLastWin = async (): Promise<void> => {
     {}
   );
 
-  await knex.transaction(async (trx) => {
-    const updates: any[] = Object.keys(ticksSinceLastWin)
-      .map((playerId) => {
-        if (playerId) {
-          return knex('player')
-            .update({
-              ticks_since_last_win: ticksSinceLastWin?.[playerId] ?? 0,
-            })
-            .where({ id: BigInt(playerId) })
-            .transacting(trx);
-        } else {
-          return null;
-        }
-      })
-      .filter((u: any) => u !== null);
+  // await knex.transaction(async (trx) => {
+  const updates: any[] = Object.keys(ticksSinceLastWin)
+    .map((playerId) => {
+      if (playerId) {
+        return knex('player')
+          .update({
+            ticks_since_last_win: ticksSinceLastWin?.[playerId] ?? 0,
+          })
+          .where({ id: BigInt(playerId) });
+        // .transacting(trx);
+      } else {
+        return null;
+      }
+    })
+    .filter((u: any) => u !== null);
 
-    try {
-      await Promise.all(updates);
-      await trx.commit();
-      log.info(`Successfully recorded ticks since last win`);
-    } catch (e) {
-      log.error(e);
-      log.error('Unexpected error saving ticks');
-      await trx.rollback();
-      throw e;
-    }
-  });
+  try {
+    await Promise.all(updates);
+    // await trx.commit();
+    log.info(`Successfully recorded ticks since last win`);
+  } catch (e) {
+    log.error(e);
+    log.error('Unexpected error saving ticks');
+    // await trx.rollback();
+    throw e;
+  }
+  // });
 };
 
 const calculateTickets = async (): Promise<void> => {
@@ -176,45 +174,57 @@ const calculateTickets = async (): Promise<void> => {
           round(
             -- Attendance
             pl.attendance_30::float *
-            -- Box modifier express as 10 + boxes / 10 to get decimal of 1.X
-            ((10 + greatest(0, sum(if(alt.rank = 'raider', 1, 0)))) / 10)::float
-            -- Add loot modifier here when we have it!
+            -- Box modifier (set on guild default 10%)
+            ((max(greatest(0, bi.total_boxes::float)) * max(g.box_modifier)) + 1) *
+            -- Loot modifier (set on guild, default 3%)
+            ((max(greatest(0, pl.ticks_since_last_win::float)) * max(g.last_win_modifier)) + 1)
           ) AS total_tickets
         `
       )
     )
     .from(`player AS pl`)
-    .leftJoin(knex.raw('player_alt AS pa on pa.player_id = pl.id'))
-    .innerJoin(knex.raw('player AS alt ON pa.alt_id = alt.id'))
+    .leftJoin(
+      knex.raw(`
+      (
+        select
+          pa.player_id,
+          count(*) AS total_boxes
+        from player_alt pa
+        inner join player as pl on pa.player_id = pl.id and pl.rank = 'raider'
+        group by pa.player_id
+      ) as bi on bi.player_id = pl.id
+    `)
+    )
+    .leftJoin(knex.raw('guild AS g ON pl.guild_id = g.id'))
     .groupBy(knex.raw('pl.id'));
 
-  await knex.transaction(async (trx) => {
-    const updates: any[] = rows
-      .map((row: any) => {
-        if (row?.id) {
-          return knex('player')
-            .update({
-              total_tickets: row.total_tickets,
-            })
-            .where({ id: row.id })
-            .transacting(trx);
-        } else {
-          return null;
-        }
-      })
-      .filter((u: any) => u !== null);
+  // await knex.transaction(async (trx) => {
+  const updates: any[] = rows
+    .map((row: any) => {
+      if (row?.id) {
+        return knex('player')
+          .update({
+            total_tickets: row.total_tickets,
+          })
+          .where({ id: row.id });
+        // .transacting(trx);
+      } else {
+        return null;
+      }
+    })
+    .filter((u: any) => u !== null);
 
-    try {
-      await Promise.all(updates);
-      await trx.commit();
-      log.info(`Successfully updated tickets of all members.`);
-    } catch (e) {
-      log.error(e);
-      log.error('Unexpected error saving tickets');
-      await trx.rollback();
-      throw e;
-    }
-  });
+  try {
+    await Promise.all(updates);
+    // await trx.commit();
+    log.info(`Successfully updated tickets of all members.`);
+  } catch (e) {
+    log.error(e);
+    log.error('Unexpected error saving tickets');
+    // await trx.rollback();
+    throw e;
+  }
+  // });
 };
 
 const allTime = async (
