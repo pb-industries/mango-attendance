@@ -262,7 +262,7 @@ const allTime = async (
     )
     .leftJoin(knex.raw('player AS p ON pr.player_id = p.id'))
     .leftJoin(knex.raw('raid AS r ON pr.raid_id = r.id'))
-    .where('r.is_official = true')
+    .where(knex.raw('r.is_official = true'))
     .groupBy(knex.raw('pr.player_id, p.name, p.id'));
 
   rows.forEach((row: AttendanceDatum) => {
@@ -317,7 +317,7 @@ const daysInRange = async (
     )
     .leftJoin(knex.raw('player AS p ON pr.player_id = p.id'))
     .leftJoin(knex.raw('raid AS r ON pr.raid_id = r.id'))
-    .where('r.is_official = true')
+    .where(knex.raw('r.is_official = true'))
     .where(
       knex.raw(`pr.created_at > current_timestamp - interval '${days}' day`)
     )
