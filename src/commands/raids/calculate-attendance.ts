@@ -250,19 +250,26 @@ const allTime = async (
             distinct if (pa.alt_id = pr.player_id, pa.player_id, pr.player_id) AS player_id,
             pr.raid_id,
             pr.raid_hour,
-            pr.created_at
-          from player_raid pr
+            r.created_at
+          from raid r
+            inner join player_raid pr on pr.raid_id = r.id
             left join player_alt pa on pa.alt_id = pr.player_id
             left join player a on pa.player_id = a.id
+          where r.is_official = true
         ) pr
     `)
     )
     .innerJoin(
-      knex.raw('player_raid AS all_raids ON all_raids.raid_id IS NOT NULL')
+      knex.raw(
+        `(
+          SELECT pr.*
+          FROM raid r
+          INNER JOIN player_raid AS pr ON pr.raid_id = r.id
+          AND r.is_official = true
+        ) AS all_raids ON all_raids.raid_id IS NOT NULL`
+      )
     )
     .leftJoin(knex.raw('player AS p ON pr.player_id = p.id'))
-    .leftJoin(knex.raw('raid AS r ON pr.raid_id = r.id'))
-    .where(knex.raw('r.is_official = true'))
     .groupBy(knex.raw('pr.player_id, p.name, p.id'));
 
   rows.forEach((row: AttendanceDatum) => {
@@ -303,21 +310,26 @@ const daysInRange = async (
             distinct if (pa.alt_id = pr.player_id, pa.player_id, pr.player_id) AS player_id,
             pr.raid_id,
             pr.raid_hour,
-            pr.created_at
-          from player_raid pr
+            r.created_at
+          from raid r
+            left join player_raid pr on pr.raid_id = r.id
             left join player_alt pa on pa.alt_id = pr.player_id
             left join player a on pa.player_id = a.id
+          where r.is_official = true
         ) pr
     `)
     )
     .innerJoin(
       knex.raw(
-        `player_raid AS all_raids ON all_raids.raid_id IS NOT NULL AND all_raids.created_at > current_timestamp - interval '${days}' day`
+        `(
+          SELECT pr.*
+          FROM raid r
+          LEFT JOIN player_raid AS pr ON pr.raid_id = r.id AND r.created_at > current_timestamp - interval '${days}' day
+          WHERE r.is_official = true
+        ) AS all_raids ON all_raids.raid_id IS NOT NULL`
       )
     )
     .leftJoin(knex.raw('player AS p ON pr.player_id = p.id'))
-    .leftJoin(knex.raw('raid AS r ON pr.raid_id = r.id'))
-    .where(knex.raw('r.is_official = true'))
     .where(
       knex.raw(`pr.created_at > current_timestamp - interval '${days}' day`)
     )
