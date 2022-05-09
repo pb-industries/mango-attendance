@@ -1,7 +1,8 @@
 import { getConnection } from '@/util/db';
 
 export default async (raidName: string, split?: number): Promise<Raid> => {
-  const date = getFormattedDate(new Date());
+  const rawDate = new Date();
+  const date = getFormattedDate(rawDate);
   if (!split) {
     split = 1;
   }
@@ -15,8 +16,19 @@ export default async (raidName: string, split?: number): Promise<Raid> => {
     .andWhere('split', split)
     .first();
 
+  // TODO: If we support multi guild, each request should derive a guild ID
+  const res = await knex.select('raid_days').from('guild').first();
+  const officialRaidDays = (res?.['raid_days'] ?? []) as number[];
+  const isOfficial =
+    officialRaidDays.length === 0 ||
+    officialRaidDays.includes(rawDate.getDay());
+
   if (raid) {
-    const params = { updated_at: new Date(), name: raidName.toLowerCase() };
+    const params = {
+      updated_at: date,
+      name: raidName.toLowerCase().trim(),
+      is_official: isOfficial,
+    };
     await knex('raid').where('id', raid.id).update(params);
     raid = { ...raid, ...params };
   } else {
@@ -24,6 +36,7 @@ export default async (raidName: string, split?: number): Promise<Raid> => {
       .insert({
         name: raidName.toLowerCase(),
         split: split,
+        is_official: isOfficial,
         created_at: date,
         updated_at: date,
       })
