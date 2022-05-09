@@ -9,6 +9,7 @@ module.exports = {
       table.float('attendance_60').nullable();
       table.float('attendance_90').nullable();
       table.float('attendance_life').nullable();
+      table.integer('total_boxes').nullable();
       table.integer('ticks_since_last_win').nullable().defaultTo(0);
       table.timestamp('created_at').defaultTo(knex.fn.now());
       table.timestamp('updated_at').defaultTo(knex.fn.now());
