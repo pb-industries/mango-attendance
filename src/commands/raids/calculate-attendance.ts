@@ -94,7 +94,7 @@ const calculateTicksSinceLastWin = async (): Promise<void> => {
               MAX(GREATEST(lh.created_at)) AS time_last_won
           from player AS pl
           inner join loot_history lh on lh.looted_by_id = pl.id
-          inner join item i on lh.item_id = i.id and i.category = 'bis'
+          inner join item i on lh.item_id = i.id and i.category = 'bis' and i.id <> 756381770069475329
           left join player_alt pa on pa.alt_id = pl.id
           group by pl.id, pa.alt_id, player_id
       ) lw on lw.player_id = pl.id
