@@ -1,4 +1,5 @@
 import { getConnection } from '@/util/db';
+// @ts-ignore
 import * as csv from 'fast-csv';
 import * as fs from 'fs';
 
@@ -13,7 +14,7 @@ export default async (): Promise<any> => {
   await fs
     .createReadStream(itemPath)
     .pipe(csv.parse({ headers: true }))
-    .on('error', (error) => console.error(error))
+    .on('error', (error: any) => console.error(error))
     .on('data', (row: any) => {
       const { name, lucy_url, lucy_id } = row;
       itemsToAdd.push({

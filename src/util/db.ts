@@ -6,7 +6,7 @@ let connection: Knex<any, unknown[]> | null = null;
 export const getConnection = async () => {
   if (!connection) {
     connection = knex({
-      client: 'pg',
+      client: 'cockroachdb',
       version: '21.2.4',
       connection: __db__ as any,
       debug: __db__.debug as any,

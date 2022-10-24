@@ -64,18 +64,18 @@ export default async (raidId: string | bigint, lootLines: LootLine[]) => {
     })
     .filter((line) => line !== null);
 
-  if (!linesToInsert) {
+  if (!linesToInsert.length) {
     return 0;
   }
 
-  const rows = await knex.raw(
-    `? ON CONFLICT loot_composite_idx
-          DO UPDATE SET
-            quantity = quantity + 1,
-            updated_at = CURRENT_TIMESTAMP
-          RETURNING *;`,
-    [knex('loot_history').insert(linesToInsert)]
-  );
+  console.log(lootLines);
+  console.info('inserting', linesToInsert);
+  const rows = await knex('loot_history')
+    .insert(linesToInsert)
+    .onConflict()
+    .ignore()
+    .returning('*');
+  console.log(rows);
   /// @ts-ignore
   return rows.reduce((acc, { rowCount }) => acc + rowCount, 0);
 };
