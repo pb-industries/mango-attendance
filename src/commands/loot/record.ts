@@ -58,8 +58,8 @@ export default async (raidId: string | bigint, lootLines: LootLine[]) => {
         quantity: BigInt(quantity ?? 1),
         looted_from: lootedFrom || null,
         was_assigned: !!parseInt(`${wasAssigned ?? '1'}`, 10) || false,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        created_at: date.toISOString(),
+        updated_at: date.toISOString(),
       };
     })
     .filter((line) => line !== null);
@@ -68,8 +68,14 @@ export default async (raidId: string | bigint, lootLines: LootLine[]) => {
     return 0;
   }
 
-  /// @ts-ignore
-  const rows = await knex.batchInsert('loot_history', linesToInsert, 1000);
+  const rows = await knex.raw(
+    `? ON CONFLICT loot_composite_idx
+          DO UPDATE SET
+            quantity = quantity + 1,
+            updated_at = CURRENT_TIMESTAMP
+          RETURNING *;`,
+    [knex('loot_history').insert(linesToInsert)]
+  );
   /// @ts-ignore
   return rows.reduce((acc, { rowCount }) => acc + rowCount, 0);
 };
