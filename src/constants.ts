@@ -9,3 +9,8 @@ export const __db__ = {
   debug: process.env.DB_DEBUG || false,
   ssl: { rejectUnauthorized: true },
 };
+export const __kafka__ = {
+  username: process.env.KAFKA_USERNAME ?? '',
+  password: process.env.KAFKA_PASSWORD ?? '',
+  brokers: process.env.KAFKA_BROKERS ?? '',
+};

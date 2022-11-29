@@ -14,7 +14,7 @@ jest.spyOn(process, 'exit').mockImplementation((code) => {
 });
 
 const knex = conn({
-  client: 'pg',
+  client: 'cockroachdb',
   version: '21.2.4',
   connection: {
     host: process.env.DB_HOST || 'localhost',

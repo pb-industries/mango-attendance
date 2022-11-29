@@ -21,6 +21,7 @@ import recordLoot from '@/commands/loot/record';
 import { __port__ } from '@/constants';
 import { log } from '@/logger';
 import cors from 'cors';
+import { disconnect, start } from './consumer';
 
 const app = express();
 
@@ -192,4 +193,9 @@ app.get('/health', async (_, res) => {
 
 app.listen(__port__, async () => {
   console.log(`Listening on port ${__port__}`);
+  console.log('Starting kafka consumer');
+  await start('loot').catch(async (e) => {
+    console.error(e);
+    await disconnect();
+  });
 });
