@@ -239,7 +239,10 @@ const allTime = async (
         `
         p.name AS player_name,
         p.id AS player_id,
-        round((cast(count(distinct pr.raid_id + pr.raid_hour) as decimal) / cast(count(distinct all_raids.raid_id + all_raids.raid_hour) as decimal) * 100), 2) AS attendance
+        round((cast(count(distinct pr.raid_id + pr.raid_hour) as decimal) / ${await totalRaidsInRange(
+          knex,
+          null
+        )} * 100), 2) AS attendance
         `
       )
     )
@@ -259,18 +262,10 @@ const allTime = async (
         ) pr
     `)
     )
-    .innerJoin(
-      knex.raw(
-        `(
-          SELECT pr.*
-          FROM raid r
-          INNER JOIN player_raid AS pr ON pr.raid_id = r.id
-          AND r.is_official = true
-        ) AS all_raids ON all_raids.raid_id IS NOT NULL`
-      )
-    )
     .leftJoin(knex.raw('player AS p ON pr.player_id = p.id'))
     .groupBy(knex.raw('pr.player_id, p.name, p.id'));
+
+  console.log('got data');
 
   rows.forEach((row: AttendanceDatum) => {
     if (aggregatedRows?.[row?.player_id]) {
@@ -288,6 +283,28 @@ const allTime = async (
   return Object.values(aggregatedRows);
 };
 
+const totalRaidsInRange = async (
+  knex: Knex<any, unknown[]>,
+  days: number | null
+): Promise<number> => {
+  let daysClause = '';
+  if (days) {
+    daysClause = ` AND r.created_at > current_timestamp - interval '${days}' day`;
+  }
+
+  const rows = await knex
+    .select(
+      knex.raw(`count(distinct pr.raid_id + pr.raid_hour) as total_raids`)
+    )
+    .from('player_raid AS pr')
+    .innerJoin(knex.raw(`raid AS r ON pr.raid_id = r.id`))
+    .where(knex.raw(`r.is_official = true${daysClause}`));
+
+  let total = 0;
+  rows.forEach((r) => (total += parseInt(r.total_raids ?? 0)));
+  return total;
+};
+
 const daysInRange = async (
   knex: Knex<any, unknown[]>,
   days: number
@@ -299,7 +316,10 @@ const daysInRange = async (
         `
         p.id AS player_id,
         p.name AS player_name,
-        round((cast(count(distinct pr.raid_id + pr.raid_hour) as decimal) / cast(count(distinct all_raids.raid_id + all_raids.raid_hour) as decimal) * 100), 2) AS attendance
+        round((cast(count(distinct pr.raid_id + pr.raid_hour) as decimal) / ${await totalRaidsInRange(
+          knex,
+          days
+        )} * 100), 2) AS attendance
         `
       )
     )
@@ -318,16 +338,6 @@ const daysInRange = async (
           where r.is_official = true
         ) pr
     `)
-    )
-    .innerJoin(
-      knex.raw(
-        `(
-          SELECT pr.*
-          FROM raid r
-          LEFT JOIN player_raid AS pr ON pr.raid_id = r.id AND r.created_at > current_timestamp - interval '${days}' day
-          WHERE r.is_official = true
-        ) AS all_raids ON all_raids.raid_id IS NOT NULL`
-      )
     )
     .leftJoin(knex.raw('player AS p ON pr.player_id = p.id'))
     .where(
