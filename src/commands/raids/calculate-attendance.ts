@@ -15,6 +15,11 @@ interface AttendanceDatum {
 }
 
 export default async () => {
+  try {
+    await fixTicks();
+  } catch (e) {
+    // dont care
+  }
   await calculateAttendance();
   await calculateTicksSinceLastWin();
   await calculateTickets();
@@ -359,4 +364,46 @@ const daysInRange = async (
   });
 
   return Object.values(aggregatedRows);
+};
+
+const fixTicks = async (): Promise<void> => {
+  const knex = await getConnection();
+  const raids = await knex
+    .select(`*`)
+    .from(
+      knex.raw(`
+        (
+          select
+            raid_id,
+            count(distinct pr.raid_hour) as total_ticks,
+            max(pr.raid_hour) + 1 as max_hour
+          from player_raid pr
+          group by raid_id
+        )
+      `)
+    )
+    .where(knex.raw(`total_ticks <> max_hour`));
+
+  console.log(raids);
+  raids.forEach(async ({ raid_id }) => {
+    const allTicks = await knex
+      .select(`raid_hour`)
+      .from(`player_raid`)
+      .where(`raid_id`, raid_id)
+      .groupBy(`raid_hour`);
+
+    let seq = -1;
+    let triggered = false;
+    allTicks.map(async ({ raid_hour }) => {
+      seq += 1;
+      console.log(raid_hour, seq);
+      if (seq <= allTicks.length && (raid_hour != seq || triggered)) {
+        triggered = true;
+        await knex('player_raid')
+          .where('raid_id', raid_id)
+          .where('raid_hour', raid_hour)
+          .update({ raid_hour: seq });
+      }
+    });
+  });
 };
