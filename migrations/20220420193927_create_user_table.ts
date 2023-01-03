@@ -4,6 +4,7 @@ module.exports = {
       table.increments('id').primary();
       table.integer('player_id').notNullable();
       table.string('email');
+      table.string('bot_token');
 
       table.timestamp('created_at').defaultTo(knex.fn.now());
       table.timestamp('updated_at').defaultTo(knex.fn.now());

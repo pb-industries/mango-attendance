@@ -22,6 +22,8 @@ import { __port__ } from '@/constants';
 import { log } from '@/logger';
 import cors from 'cors';
 import { disconnect, start } from './consumer';
+import login from '@/commands/login';
+import produce from '@/server/producer';
 
 const app = express();
 
@@ -182,6 +184,25 @@ app.post('/roster/alt', async (req, res) => {
       data: await addAlt(`${main_id}`, alt_params),
     });
   }
+});
+
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  const token = await login(username, password);
+
+  produce('bot_audit', [
+    {
+      value: JSON.stringify({
+        success: !!token,
+        action: 'login',
+        username,
+        ip: req.headers['x-forwarded-for'] ?? req.ip,
+        token,
+      }),
+    },
+  ]);
+
+  res.send({ success: !!token, token });
 });
 
 app.get('/health', async (_, res) => {
