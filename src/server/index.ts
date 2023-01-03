@@ -22,7 +22,7 @@ import { __port__ } from '@/constants';
 import { log } from '@/logger';
 import cors from 'cors';
 import { disconnect, start } from './consumer';
-import login from '@/commands/login';
+import login, { loginWithToken } from '@/commands/login';
 import produce from '@/server/producer';
 
 const app = express();
@@ -187,14 +187,22 @@ app.post('/roster/alt', async (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-  const token = await login(username, password);
+  const { username, password, token } = req.body;
+  const strategy = token ? 'token' : 'credentials';
+
+  let authToken;
+  if (token) {
+    authToken = await loginWithToken(token);
+  } else {
+    authToken = await login(username, password);
+  }
 
   produce('bot_audit', [
     {
       value: JSON.stringify({
-        success: !!token,
+        success: !!authToken,
         action: 'login',
+        strategy,
         username,
         ip: req.headers['x-forwarded-for'] ?? req.ip,
         token,
@@ -202,7 +210,7 @@ app.post('/login', async (req, res) => {
     },
   ]);
 
-  res.send({ success: !!token, token });
+  res.send({ success: !!authToken, token: authToken });
 });
 
 app.get('/health', async (_, res) => {
