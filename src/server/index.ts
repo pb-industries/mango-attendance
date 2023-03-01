@@ -23,7 +23,7 @@ import { log } from '@/logger';
 import cors from 'cors';
 import { disconnect, start } from './consumer';
 import login, { loginWithToken } from '@/commands/login';
-import produce from '@/server/producer';
+// import produce from '@/server/producer';
 
 const app = express();
 
@@ -197,18 +197,18 @@ app.post('/login', async (req, res) => {
     authToken = await login(username, password);
   }
 
-  produce('bot_audit', [
-    {
-      value: JSON.stringify({
-        success: !!authToken,
-        action: 'login',
-        strategy,
-        username,
-        ip: req.headers['x-forwarded-for'] ?? req.ip,
-        token,
-      }),
-    },
-  ]);
+  // produce('bot_audit', [
+  //   {
+  //     value: JSON.stringify({
+  //       success: !!authToken,
+  //       action: 'login',
+  //       strategy,
+  //       username,
+  //       ip: req.headers['x-forwarded-for'] ?? req.ip,
+  //       token,
+  //     }),
+  //   },
+  // ]);
 
   res.send({ success: !!authToken, token: authToken });
 });
