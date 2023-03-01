@@ -23,7 +23,7 @@ import { log } from '@/logger';
 import cors from 'cors';
 import { disconnect, start } from './consumer';
 import login, { loginWithToken } from '@/commands/login';
-// import produce from '@/server/producer';
+import produce from '@/server/producer';
 
 const app = express();
 
@@ -197,18 +197,23 @@ app.post('/login', async (req, res) => {
     authToken = await login(username, password);
   }
 
-  // produce('bot_audit', [
-  //   {
-  //     value: JSON.stringify({
-  //       success: !!authToken,
-  //       action: 'login',
-  //       strategy,
-  //       username,
-  //       ip: req.headers['x-forwarded-for'] ?? req.ip,
-  //       token,
-  //     }),
-  //   },
-  // ]);
+  try {
+    produce('bot_audit', [
+      {
+        value: JSON.stringify({
+          success: !!authToken,
+          action: 'login',
+          strategy,
+          username,
+          ip: req.headers['x-forwarded-for'] ?? req.ip,
+          token,
+        }),
+      },
+    ]);
+  } catch (e) {
+    console.log('cant start producer');
+    console.error(e);
+  }
 
   res.send({ success: !!authToken, token: authToken });
 });
@@ -223,8 +228,13 @@ app.get('/health', async (_, res) => {
 app.listen(__port__, async () => {
   console.log(`Listening on port ${__port__}`);
   console.log('Starting kafka consumer');
-  await start('loot').catch(async (e) => {
+  try {
+    await start('loot').catch(async (e) => {
+      console.error(e);
+      await disconnect();
+    });
+  } catch (e) {
+    console.log('cant start consumer');
     console.error(e);
-    await disconnect();
-  });
+  }
 });
