@@ -183,7 +183,13 @@ const calculateTickets = async (): Promise<void> => {
             ((max(greatest(0, bi.total_boxes::float)) * max(g.box_modifier)) + 1) *
             -- Loot modifier (set on guild, default 3%)
             ((max(greatest(0, pl.ticks_since_last_win::float)) * max(g.last_win_modifier)) + 1)
-          ) AS total_tickets
+          ) AS total_tickets,
+          round(
+            -- Attendance
+            pl.attendance_60::float *
+            -- Box modifier (set on guild default 10%)
+            ((max(greatest(0, bi.total_boxes::float)) * max(g.box_modifier)) + 1)
+          ) AS base_tickets
         `
       )
     )
@@ -211,6 +217,7 @@ const calculateTickets = async (): Promise<void> => {
         return knex('player')
           .update({
             total_tickets: row.total_tickets,
+            base_tickets: row.base_tickets
           })
           .where({ id: row.id });
         // .transacting(trx);
