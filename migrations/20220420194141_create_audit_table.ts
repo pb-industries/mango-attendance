@@ -17,7 +17,13 @@ module.exports = {
         .onUpdate('CASCADE');
 
       table
-        .foreign('target_player_id')
+        .foreign('from_player_id')
+        .references('player.id')
+        .onDelete('CASCADE')
+        .onUpdate('CASCADE');
+
+      table
+        .foreign('to_player_id')
         .references('player.id')
         .onDelete('CASCADE')
         .onUpdate('CASCADE');

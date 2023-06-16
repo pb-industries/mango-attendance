@@ -202,7 +202,7 @@ const calculateTickets = async (): Promise<void> => {
           count(*) AS total_boxes
         from player AS pl
         inner join player_alt as pa on pa.alt_id = pl.id
-        where pl.rank = 'raider'
+        where pl.rank IN ('raider', 'support')
         group by pa.player_id
       ) as bi on bi.player_id = pl.id
     `)
