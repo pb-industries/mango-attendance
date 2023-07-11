@@ -96,14 +96,17 @@ app.get('/raid/calculate-attendance', async (_, res) => {
 
 // RAFFLE endpoints
 app.get('/raffle/tickets', async (req, res) => {
-  let { raffle_id, player_ids } = req.body;
-  if (!raffle_id || !player_ids) {
+  let { player_names } = req.query;
+  if (!player_names) {
     res.status(400).send('Missing raffle id or player ids');
   } else {
-    if (typeof player_ids === 'string') {
-      player_ids = player_ids.split(',').map((id) => `${id}`);
+    let names = [];
+    if (typeof player_names === 'string') {
+      names = player_names.split(',').map((id) => `${id}`);
+    } else {
+      names = player_names as string[];
     }
-    res.status(200).send(await fetchRaffleRolls(raffle_id, player_ids));
+    res.status(200).send(await fetchRaffleRolls(names));
   }
 });
 
