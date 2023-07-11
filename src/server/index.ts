@@ -96,7 +96,10 @@ app.get('/raid/calculate-attendance', async (_, res) => {
 
 // RAFFLE endpoints
 app.get('/raffle/tickets', async (req, res) => {
-  let { player_names } = req.query;
+  let player_names = req.query?.player_names;
+  if (!player_names) {
+    player_names = req.body?.player_names;
+  }
   if (!player_names) {
     res.status(400).send('Missing raffle id or player ids');
   } else {
