@@ -202,7 +202,7 @@ const calculateTickets = async (): Promise<void> => {
           count(*) AS total_boxes
         from player AS pl
         inner join player_alt as pa on pa.alt_id = pl.id
-        where pl.rank IN ('raider', 'support')
+        where pl.rank IN ('raider')
         group by pa.player_id
       ) as bi on bi.player_id = pl.id
     `)
@@ -217,7 +217,7 @@ const calculateTickets = async (): Promise<void> => {
         return knex('player')
           .update({
             total_tickets: row.total_tickets,
-            base_tickets: row.base_tickets
+            base_tickets: row.base_tickets,
           })
           .where({ id: row.id });
         // .transacting(trx);
