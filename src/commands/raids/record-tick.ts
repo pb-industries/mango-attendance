@@ -120,7 +120,11 @@ const fetchPlayers = async (attendees: string[]): Promise<AttendeeMetadata> => {
   const players = await knex
     .select(['p.id', 'p.name'])
     .from('player AS p')
-    .whereIn('p.name', attendees);
+    .innerJoin(knex.raw('player_alt AS pa ON pa.alt_id = p.id'))
+    .innerJoin(knex.raw('player AS pm ON pa.player_id = pm.id'))
+    .whereIn('p.name', attendees)
+    .whereNull('pm.deleted_at')
+    .groupByRaw('pm.id');
 
   const attendeeMetadata: AttendeeMetadata = {};
   players.forEach((player) => {
