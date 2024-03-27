@@ -120,7 +120,7 @@ const fetchPlayers = async (attendees: string[]): Promise<AttendeeMetadata> => {
   const players = await knex
     .select([
       knex.raw('DISTINCT COALESCE(pm.id, p.id) AS id'),
-      'COALESCE(pm.name, p.name) AS name',
+      knex.raw('COALESCE(pm.name, p.name) AS name'),
     ])
     .from('player AS p')
     .innerJoin(knex.raw('player_alt AS pa ON pa.alt_id = p.id'))
