@@ -118,18 +118,21 @@ const getPreviousTick = async (raidId: string): Promise<Tick | null> => {
 const fetchPlayers = async (attendees: string[]): Promise<AttendeeMetadata> => {
   const knex = await getConnection();
   const players = await knex
-    .select([
-      knex.raw('DISTINCT COALESCE(pm.id, p.id) AS id'),
-      knex.raw('COALESCE(pm.name, p.name) AS name'),
-    ])
-    .from('player AS p')
-    .innerJoin(knex.raw('player_alt AS pa ON pa.alt_id = p.id'))
-    .innerJoin(knex.raw('player AS pm ON pa.player_id = pm.id'))
+    .select([knex.raw('DISTINCT main.id'), knex.raw('main.name')])
+    .from('player_alt AS pa')
+    .innerJoin(
+      knex.raw(
+        'player AS main ON pa.player_id = main.id AND main.deleted_at IS NULL'
+      )
+    )
+    .innerJoin(
+      knex.raw('player AS alt ON pa.alt_id = alt.id AND alt.deleted_at IS NULL')
+    )
     .whereRaw(
       `
-      (p.deleted_at IS NULL AND p.name IN ('${attendees.join("','")}'))
+      (main.name IN ('${attendees.join("','")}'))
       OR
-      (pm.deleted_at IS NULL AND pm.name IN ('${attendees.join("','")}'))
+      (alt.name IN ('${attendees.join("','")}'))
       `
     );
 
