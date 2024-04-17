@@ -10,6 +10,7 @@ const setToken = async (knex: Knex, player: any) => {
       user_id: player.user_id,
       player_id: player.id,
       player_name: player.name,
+      bypass_enabled: player.bypass_enabled ?? false,
     })
   ).toString('base64');
 
