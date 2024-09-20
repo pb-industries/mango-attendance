@@ -235,7 +235,7 @@ app.listen(__port__, async () => {
   console.log(`Listening on port ${__port__}`);
   console.log('Starting kafka consumer');
   try {
-    await start('loot').catch(async (e) => {
+    await start('loot-mango').catch(async (e) => {
       console.error(e);
       await disconnect();
     });
