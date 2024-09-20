@@ -2,7 +2,7 @@ import record from '@/commands/loot/record';
 import { __kafka__ } from '@/constants';
 import { Kafka } from 'kafkajs';
 
-const clientId = 'loot-parser-client';
+const clientId = 'loot-parser-client-mango';
 
 const brokers = [__kafka__.brokers];
 const kafka = new Kafka({
@@ -17,7 +17,7 @@ const kafka = new Kafka({
 });
 
 const consumer = kafka.consumer({
-  groupId: 'loot-parser-client',
+  groupId: clientId,
 });
 
 export const start = async (topic: string) => {

@@ -1,8 +1,8 @@
-version: "3.8"
+version: '3.8'
 
 services:
-  bnc-attendance:
-    container_name: bnc-attendance
+  mango-attendance:
+    container_name: mango-attendance
     build:
       context: ./
       dockerfile: ./Dockerfile

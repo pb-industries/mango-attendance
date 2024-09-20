@@ -1,3 +1,3 @@
-# BNC Attendance Server
+# Mango Attendance Server
 
-Rest API which drives our bnc-attendance-client-react and bnc-attendance-gui applications.
+Rest API which drives our mango-attendance-client-react and mango-attendance-gui applications.

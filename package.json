@@ -1,5 +1,5 @@
 {
-  "name": "bnc-attendance",
+  "name": "mango-attendance",
   "version": "1.0.0",
   "scripts": {
     "postinstall": "[ \"$NODE_ENV\" = production ] || yarn husky install",
